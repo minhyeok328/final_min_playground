@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Button, Layout, Select, Space } from 'antd';
-import { LogoutOutlined } from '@ant-design/icons';
+import { Button, Input, Layout, Select, Space } from 'antd';
+import { LogoutOutlined, SearchOutlined } from '@ant-design/icons';
 import { NotificationButton } from './NotificationButton';
 import type { NotificationsData } from '../../api/adapters';
 import { mainMenu, type AppRoute } from '../../data/mockData';
@@ -22,6 +22,12 @@ export function TopHeader({ route, themeSwitch, notifications, navigate }: TopHe
         <img src="/assets/humour-app-icon.png" alt="" />
         <span>{mainMenu.find((item) => item.route === route)?.label}</span>
       </div>
+      <Input
+        className="top-search"
+        prefix={<SearchOutlined />}
+        placeholder="지원자, JD, 분석 리포트 검색"
+        aria-label="검색"
+      />
       <Select
         className="mobile-route-select"
         value={route}
@@ -29,7 +35,7 @@ export function TopHeader({ route, themeSwitch, notifications, navigate }: TopHe
         options={mainMenu.map((item) => ({ value: item.route, label: item.label }))}
         aria-label="화면 선택"
       />
-      <Space>
+      <Space className="top-actions">
         <NotificationButton notifications={notifications} />
         {themeSwitch}
         <Button className="logout-button" icon={<LogoutOutlined />} onClick={() => navigate('/login')}>
