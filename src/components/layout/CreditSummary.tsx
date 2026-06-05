@@ -10,7 +10,10 @@ type CreditSummaryProps = {
 export function CreditSummary({ creditPercent, showAlert }: CreditSummaryProps) {
   return (
     <div className="credit-card">
-      <span>분석 크레딧</span>
+      <div className="credit-card-head">
+        <span>분석 크레딧</span>
+        <strong>{creditPercent}%</strong>
+      </div>
       <Progress percent={creditPercent} strokeColor={palette.accent} />
       <Button
         size="small"
