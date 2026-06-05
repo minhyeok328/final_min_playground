@@ -31,6 +31,7 @@ pnpm-debug.log*
 # Tool caches
 .eslintcache
 *.tsbuildinfo
+.npm-cache/
 
 # Local agent / brainstorm sessions
 .superpowers/
