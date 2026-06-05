@@ -73,7 +73,7 @@ export const mockClient = {
     delayedResponse(
       actionResponse('AI 답변을 추가했습니다.', {
         role: 'assistant' as const,
-        text: `${question} 질문 기준으로 보면 JD 요구사항과 자기소개서 근거가 잘 연결되어 있습니다. 테스트 자동화 경험은 면접에서 한 번 더 확인하는 편이 좋습니다.`,
+        text: `${question} 질문과 관련해 사내 문서, JD, 분석 리포트에서 근거를 찾았습니다. 면접 평가 기준 v3와 채용 운영 가이드를 함께 확인하면 다음 액션을 정리할 수 있습니다.`,
       }),
       560,
     ),
