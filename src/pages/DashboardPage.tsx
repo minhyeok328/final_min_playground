@@ -1,10 +1,9 @@
-import { Button, Col, Row, Space } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Col, Row } from 'antd';
 import { AnalysisSummaryPanel } from '../components/dashboard/AnalysisSummaryPanel';
 import { ApplicantReviewTable } from '../components/dashboard/ApplicantReviewTable';
+import { DashboardHero } from '../components/dashboard/DashboardHero';
 import { DashboardMetrics } from '../components/dashboard/DashboardMetrics';
 import { TaskListPanel } from '../components/dashboard/TaskListPanel';
-import { PageTitle } from '../components/common/PageTitle';
 import type { DashboardData } from '../api/adapters';
 import type { Navigate, ShowAlert, ThemeMode } from '../types/app';
 
@@ -19,26 +18,7 @@ type DashboardPageProps = {
 export function DashboardPage({ dashboard, mode, navigate, showAlert, reloadData }: DashboardPageProps) {
   return (
     <>
-      <PageTitle
-        eyebrow="Dashboard"
-        title="채용 현황 대시보드"
-        description="채용 공고, 지원자, AI 분석 리포트 상태를 한 화면에서 확인합니다."
-        actions={
-          <Space wrap>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() =>
-                void reloadData().then(() => showAlert({ type: 'info', message: '대시보드 데이터를 새로고침했습니다.' }))
-              }
-            >
-              새로고침
-            </Button>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/jd')}>
-              새 채용 공고
-            </Button>
-          </Space>
-        }
-      />
+      <DashboardHero dashboard={dashboard} navigate={navigate} showAlert={showAlert} reloadData={reloadData} />
 
       <DashboardMetrics metrics={dashboard.metrics} />
 
