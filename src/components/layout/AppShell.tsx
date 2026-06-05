@@ -11,6 +11,7 @@ const { Content } = Layout;
 type AppShellProps = {
   route: AppRoute;
   children: ReactNode;
+  assistantFab?: ReactNode;
   themeSwitch: ReactNode;
   creditPercent: number;
   notifications?: NotificationsData;
@@ -21,6 +22,7 @@ type AppShellProps = {
 export function AppShell({
   route,
   children,
+  assistantFab,
   themeSwitch,
   creditPercent,
   notifications,
@@ -32,8 +34,13 @@ export function AppShell({
       <SidebarNav route={route} creditPercent={creditPercent} navigate={navigate} showAlert={showAlert} />
       <Layout>
         <TopHeader route={route} themeSwitch={themeSwitch} notifications={notifications} navigate={navigate} />
-        <Content className="content">{children}</Content>
+        <Content className="content">
+          <div className="content-frame" key={route}>
+            {children}
+          </div>
+        </Content>
       </Layout>
+      {assistantFab}
     </Layout>
   );
 }
