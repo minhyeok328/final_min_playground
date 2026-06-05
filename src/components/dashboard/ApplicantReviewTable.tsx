@@ -12,6 +12,7 @@ type ApplicantReviewTableProps = {
 export function ApplicantReviewTable({ applicants, showAlert }: ApplicantReviewTableProps) {
   return (
     <SectionCard
+      className="applicant-review-card"
       title="지원자 검토 목록"
       extra={
         <Button
@@ -38,7 +39,7 @@ export function ApplicantReviewTable({ applicants, showAlert }: ApplicantReviewT
           {
             title: '적합도',
             dataIndex: 'fit',
-            render: (value: number) => <Progress percent={value} size="small" />,
+            render: (value: number) => <Progress className="fit-progress" percent={value} size="small" />,
           },
           { title: '단계', dataIndex: 'stage' },
           {
