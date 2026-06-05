@@ -94,7 +94,7 @@ JD별 **단건 입력** UI와 **Excel 업로드** 미리보기, **분석 요청*
 { "jd_id": "jd-fe" }
 ```
 
-성공 후: `analysisDone = true` → 「채팅 화면에서 리포트 확인」→ `#/chat`.
+성공 후: `analysisDone = true` → 「AI 문서 검색 화면에서 리포트 확인」→ `#/chat`.
 
 ## 목업 한계
 
