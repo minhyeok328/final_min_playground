@@ -72,8 +72,8 @@ export const mainMenu: MenuItem[] = [
   },
   {
     route: '/chat',
-    label: '채팅',
-    description: '리포트 기반 질의응답',
+    label: 'AI 문서 검색',
+    description: '사내 문서·리포트 통합 질의',
     icon: <MessageOutlined />,
   },
   {
