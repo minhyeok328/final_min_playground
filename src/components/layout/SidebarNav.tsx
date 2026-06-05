@@ -26,7 +26,9 @@ export function SidebarNav({ route, creditPercent, navigate, showAlert }: Sideba
             className={`side-nav-item ${route === item.route ? 'active' : ''}`}
             onClick={() => navigate(item.route)}
           >
-            {item.icon}
+            <span className="side-icon" aria-hidden="true">
+              {item.icon}
+            </span>
             <span>
               <strong>{item.label}</strong>
               <small>{item.description}</small>
