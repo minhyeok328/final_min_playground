@@ -12,10 +12,13 @@ type AnalysisSummaryPanelProps = {
 
 export function AnalysisSummaryPanel({ analysisSummary, insightCards, mode }: AnalysisSummaryPanelProps) {
   return (
-    <SectionCard title="분석 요약">
-      <DonutChart data={analysisSummary} mode={mode} />
+    <SectionCard title="분석 요약" className="analysis-summary-card">
+      <div className="donut-frame">
+        <DonutChart data={analysisSummary} mode={mode} />
+      </div>
       <Divider />
       <List
+        className="insight-list"
         dataSource={insightCards}
         renderItem={(item) => (
           <List.Item>
