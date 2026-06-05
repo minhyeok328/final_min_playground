@@ -3,7 +3,7 @@
 ```mermaid
 flowchart LR
   subgraph boot [앱 기동]
-    A[useMockAppData] --> B[mockClient GET x11]
+    A[useMockAppData] --> B[mockClient GET x12]
     B --> C[apiMockData 샘플]
     C --> D[adapters map*]
     D --> E[App state data]
@@ -40,7 +40,7 @@ Django 연동 시: 동일 흐름으로 HTTP 클라이언트 + `status_code` / `m
 |------|------|
 | `selectedJdIdOverride` | JD·자소서·템플릿에서 선택 JD |
 | `selectedRowKeys` | 모집 공고 다중 JD 선택 |
-| `chatMessages` | 채팅 메시지 누적 |
+| `chatMessages`, `chatInput` | AI 문서 검색 — `DocumentChatFab`와 `ChatPage` 공유 |
 | `coverUploaded`, `analysisDone` | 자소서 업로드·분석 UI 플래그 |
 | `postGenerated`, `templateGenerated` | 생성 결과 표시 여부 |
 
