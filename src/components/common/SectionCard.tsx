@@ -9,8 +9,10 @@ type SectionCardProps = {
 };
 
 export function SectionCard({ children, className, title, extra }: SectionCardProps) {
+  const cardClassName = ['section-card', className].filter(Boolean).join(' ');
+
   return (
-    <Card className={className} title={title} extra={extra}>
+    <Card className={cardClassName} title={title} extra={extra}>
       {children}
     </Card>
   );
