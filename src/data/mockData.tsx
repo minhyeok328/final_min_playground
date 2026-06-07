@@ -6,7 +6,6 @@ import {
   FileTextOutlined,
   FormOutlined,
   IdcardOutlined,
-  MessageOutlined,
   ProfileOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -69,12 +68,6 @@ export const mainMenu: MenuItem[] = [
     label: '자기소개서',
     description: '단건 입력과 Excel 업로드',
     icon: <FileTextOutlined />,
-  },
-  {
-    route: '/chat',
-    label: 'AI 문서 검색',
-    description: '사내 문서·리포트 통합 질의',
-    icon: <MessageOutlined />,
   },
   {
     route: '/mypage',
