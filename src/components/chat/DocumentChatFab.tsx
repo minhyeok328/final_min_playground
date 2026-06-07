@@ -36,16 +36,27 @@ type WidgetPosition = {
   y: number;
 };
 
+type FloatingSize = {
+  width: number;
+  height: number;
+};
+
 type DragState = {
   pointerId: number;
   startX: number;
   startY: number;
   origin: WidgetPosition;
+  size: FloatingSize;
+  source: 'fab' | 'widget';
+  moved: boolean;
 };
 
 const widgetStorageKey = 'humour-document-chat-widget-position';
 const widgetWidth = 420;
 const widgetHeight = 680;
+const fabWidth = 176;
+const fabHeight = 58;
+const mobileFabWidth = 58;
 const widgetMargin = 20;
 const mobileBreakpoint = 767;
 const desktopSidebarWidth = 292;
@@ -71,12 +82,16 @@ const getWidgetSize = () => ({
   height: Math.min(widgetHeight, Math.max(360, window.innerHeight - widgetMargin * 2)),
 });
 
-const clampPosition = (position: WidgetPosition): WidgetPosition => {
+const getFabSize = () => ({
+  width: isMobileViewport() ? mobileFabWidth : fabWidth,
+  height: fabHeight,
+});
+
+const clampPosition = (position: WidgetPosition, size: FloatingSize = getWidgetSize()): WidgetPosition => {
   if (typeof window === 'undefined') {
     return position;
   }
 
-  const size = getWidgetSize();
   const minX = window.innerWidth > desktopShellBreakpoint ? desktopSidebarWidth + widgetMargin : widgetMargin;
   const minY = widgetMargin;
   const maxX = Math.max(widgetMargin, window.innerWidth - size.width - widgetMargin);
@@ -88,16 +103,15 @@ const clampPosition = (position: WidgetPosition): WidgetPosition => {
   };
 };
 
-const getDefaultPosition = (): WidgetPosition => {
+const getDefaultPosition = (size: FloatingSize = getWidgetSize()): WidgetPosition => {
   if (typeof window === 'undefined') {
     return { x: widgetMargin, y: widgetMargin };
   }
 
-  const size = getWidgetSize();
   return clampPosition({
     x: window.innerWidth - size.width - 28,
     y: window.innerHeight - size.height - 28,
-  });
+  }, size);
 };
 
 const readStoredPosition = (): WidgetPosition | null => {
@@ -116,7 +130,7 @@ const readStoredPosition = (): WidgetPosition | null => {
       return null;
     }
 
-    return clampPosition({ x: parsed.x, y: parsed.y });
+    return clampPosition({ x: parsed.x, y: parsed.y }, getFabSize());
   } catch {
     return null;
   }
@@ -135,8 +149,9 @@ export function DocumentChatFab({
   const [open, setOpen] = useState(false);
   const [scope, setScope] = useState(scopeOptions[0]);
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState<WidgetPosition>(() => readStoredPosition() ?? getDefaultPosition());
+  const [position, setPosition] = useState<WidgetPosition>(() => readStoredPosition() ?? getDefaultPosition(getFabSize()));
   const dragStateRef = useRef<DragState | null>(null);
+  const suppressNextOpenRef = useRef(false);
 
   const widgetStyle = useMemo(
     () => ({
@@ -148,12 +163,12 @@ export function DocumentChatFab({
 
   useEffect(() => {
     const handleResize = () => {
-      setPosition((current) => clampPosition(current));
+      setPosition((current) => clampPosition(current, open ? getWidgetSize() : getFabSize()));
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (isMobileViewport()) {
@@ -182,11 +197,17 @@ export function DocumentChatFab({
         x: dragState.origin.x + event.clientX - dragState.startX,
         y: dragState.origin.y + event.clientY - dragState.startY,
       };
+      if (Math.abs(event.clientX - dragState.startX) > 5 || Math.abs(event.clientY - dragState.startY) > 5) {
+        dragState.moved = true;
+      }
 
-      setPosition(clampPosition(nextPosition));
+      setPosition(clampPosition(nextPosition, dragState.size));
     };
 
     const stopDragging = () => {
+      if (dragStateRef.current?.source === 'fab' && dragStateRef.current.moved) {
+        suppressNextOpenRef.current = true;
+      }
       dragStateRef.current = null;
       setIsDragging(false);
     };
@@ -203,7 +224,12 @@ export function DocumentChatFab({
   }, [isDragging]);
 
   const openWidget = () => {
-    setPosition((current) => clampPosition(current));
+    if (suppressNextOpenRef.current) {
+      suppressNextOpenRef.current = false;
+      return;
+    }
+
+    setPosition((current) => clampPosition(current, getWidgetSize()));
     setOpen(true);
   };
 
@@ -212,14 +238,20 @@ export function DocumentChatFab({
     navigate('/chat');
   };
 
-  const handleDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const beginDrag = (
+    event: ReactPointerEvent<HTMLElement>,
+    source: DragState['source'],
+    size: FloatingSize,
+  ) => {
     if (event.button !== 0 || isMobileViewport()) {
       return;
     }
 
-    const target = event.target as HTMLElement;
-    if (target.closest('button, input, textarea, a')) {
-      return;
+    if (source === 'widget') {
+      const target = event.target as HTMLElement;
+      if (target.closest('button, input, textarea, a')) {
+        return;
+      }
     }
 
     dragStateRef.current = {
@@ -227,9 +259,28 @@ export function DocumentChatFab({
       startX: event.clientX,
       startY: event.clientY,
       origin: position,
+      size,
+      source,
+      moved: false,
     };
     setIsDragging(true);
     event.preventDefault();
+  };
+
+  const handleFabDragStart = (event: ReactPointerEvent<HTMLElement>) => {
+    beginDrag(event, 'fab', getFabSize());
+  };
+
+  const handleWidgetDragStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+    beginDrag(event, 'widget', getWidgetSize());
+  };
+
+  const handleFabClick = () => {
+    if (isDragging) {
+      return;
+    }
+
+    openWidget();
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -241,9 +292,11 @@ export function DocumentChatFab({
     <>
       {!open && (
         <Button
-          className="document-chat-fab"
+          className={`document-chat-fab ${isDragging ? 'dragging' : ''}`}
           type="primary"
-          onClick={openWidget}
+          style={widgetStyle}
+          onPointerDown={handleFabDragStart}
+          onClick={handleFabClick}
           aria-expanded={open}
           aria-label="AI 문서 검색 위젯 열기"
         >
@@ -262,7 +315,7 @@ export function DocumentChatFab({
           aria-modal="false"
           aria-labelledby="document-chat-widget-title"
         >
-          <div className="document-chat-widget-header" onPointerDown={handleDragStart}>
+          <div className="document-chat-widget-header" onPointerDown={handleWidgetDragStart}>
             <div className="document-chat-widget-drag-handle" aria-label="채팅 위젯 이동">
               <HolderOutlined />
             </div>
