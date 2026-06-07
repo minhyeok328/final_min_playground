@@ -77,7 +77,39 @@ async function verifyDesktopWidget(page) {
   await page.goto(`${baseUrl}/#/dashboard`, { waitUntil: 'networkidle' });
   await assertNoHorizontalOverflow(page, 'desktop dashboard');
 
-  await page.locator('.document-chat-fab').click();
+  const hasChatMenu = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.sidebar .side-nav-item')).some((item) =>
+      item.textContent?.includes('AI 문서 검색'),
+    ),
+  );
+  if (hasChatMenu) {
+    throw new Error('사이드바에 AI 문서 검색 메뉴가 남아 있습니다.');
+  }
+
+  const fab = page.locator('.document-chat-fab');
+  await fab.waitFor({ state: 'visible', timeout: 5000 });
+
+  const fabBefore = await fab.boundingBox();
+  if (!fabBefore) {
+    throw new Error('접힌 채팅 FAB 영역을 찾지 못했습니다.');
+  }
+
+  await page.mouse.move(fabBefore.x + fabBefore.width / 2, fabBefore.y + fabBefore.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(fabBefore.x - 220, fabBefore.y - 130, { steps: 8 });
+  await page.mouse.up();
+
+  const fabAfter = await fab.boundingBox();
+  if (!fabAfter || (Math.abs(fabAfter.x - fabBefore.x) < 20 && Math.abs(fabAfter.y - fabBefore.y) < 20)) {
+    throw new Error(`접힌 채팅 FAB가 드래그 후 움직이지 않았습니다. before=${JSON.stringify(fabBefore)} after=${JSON.stringify(fabAfter)}`);
+  }
+
+  const openedByDrag = await page.locator('.document-chat-widget').count();
+  if (openedByDrag > 0) {
+    throw new Error('접힌 FAB를 드래그하는 동안 채팅 위젯이 열렸습니다.');
+  }
+
+  await fab.click();
   const widget = page.locator('.document-chat-widget');
   const dragHandle = page.locator('.document-chat-widget-drag-handle');
 
