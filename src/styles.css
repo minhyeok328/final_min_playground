@@ -131,14 +131,14 @@ button,
   clip-path: polygon(18% 0, 100% 12%, 100% 100%, 0 100%);
 }
 
-.shell > .ant-layout,
+.shell>.ant-layout,
 .shell .ant-layout {
   position: relative;
   z-index: 1;
   background: transparent;
 }
 
-.shell > .ant-layout {
+.shell>.ant-layout {
   margin-left: 292px;
 }
 
@@ -358,7 +358,7 @@ button,
   font-weight: 700;
 }
 
-.sidebar-account-button > svg {
+.sidebar-account-button>svg {
   color: rgba(255, 255, 255, 0.68);
   font-size: 12px;
 }
@@ -456,7 +456,7 @@ button,
   outline: none;
 }
 
-.account-menu-item > svg:first-child {
+.account-menu-item>svg:first-child {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -468,7 +468,7 @@ button,
   font-size: 15px;
 }
 
-.account-menu-item > svg:last-child {
+.account-menu-item>svg:last-child {
   color: var(--subtle);
   font-size: 11px;
 }
@@ -486,7 +486,7 @@ button,
   font-weight: 700;
 }
 
-.account-menu-item.danger > svg:first-child {
+.account-menu-item.danger>svg:first-child {
   color: var(--danger);
   background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
@@ -500,7 +500,7 @@ button,
   background: color-mix(in srgb, var(--surface) 84%, var(--accent-soft));
 }
 
-.account-credit-panel > div {
+.account-credit-panel>div {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 8px;
@@ -564,7 +564,7 @@ button,
   background: color-mix(in srgb, var(--surface) 86%, var(--primary-soft));
 }
 
-.account-theme-row > span {
+.account-theme-row>span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -574,7 +574,7 @@ button,
   font-weight: 900;
 }
 
-.account-theme-row > span svg {
+.account-theme-row>span svg {
   color: var(--primary);
 }
 
@@ -677,7 +677,7 @@ button,
 }
 
 .top-actions .ant-btn,
-.notification-list + .ant-btn {
+.notification-list+.ant-btn {
   box-shadow: var(--shadow-sm);
 }
 
@@ -726,7 +726,7 @@ button,
   content: "";
 }
 
-.page-title > * {
+.page-title>* {
   position: relative;
   z-index: 1;
 }
@@ -885,7 +885,7 @@ button,
   background: transparent !important;
 }
 
-.ant-table-thead > tr > th {
+.ant-table-thead>tr>th {
   color: var(--muted) !important;
   font-size: 13px;
   font-weight: 900 !important;
@@ -893,12 +893,12 @@ button,
   border-bottom-color: var(--border) !important;
 }
 
-.ant-table-tbody > tr > td {
+.ant-table-tbody>tr>td {
   color: var(--text);
   border-bottom-color: var(--border) !important;
 }
 
-.ant-table-tbody > tr:hover > td {
+.ant-table-tbody>tr:hover>td {
   background: color-mix(in srgb, var(--primary-soft) 58%, transparent) !important;
 }
 
@@ -929,7 +929,7 @@ button,
   background: color-mix(in srgb, var(--primary-soft) 64%, var(--surface-soft)) !important;
 }
 
-.ant-form-item-label > label,
+.ant-form-item-label>label,
 .metric-card .ant-statistic-title,
 .form-stat-label {
   color: var(--muted) !important;
@@ -1243,7 +1243,7 @@ button,
   gap: 10px;
 }
 
-.summary-progress > div {
+.summary-progress>div {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1458,12 +1458,12 @@ button,
   background: var(--primary-soft);
 }
 
-.selection-card > strong {
+.selection-card>strong {
   color: var(--text);
   font-size: 15px;
 }
 
-.selection-card > span:not(.selection-check) {
+.selection-card>span:not(.selection-check) {
   color: var(--muted);
   font-size: 13px;
 }
@@ -1913,7 +1913,7 @@ button,
   background: color-mix(in srgb, var(--surface) 88%, var(--primary-soft));
 }
 
-.document-suggestions > strong {
+.document-suggestions>strong {
   color: var(--text);
 }
 
@@ -2168,11 +2168,11 @@ button,
 
 @media (max-width: 991px) {
   .sidebar,
-  .shell > .ant-layout-sider {
+  .shell>.ant-layout-sider {
     display: none !important;
   }
 
-  .shell > .ant-layout {
+  .shell>.ant-layout {
     margin-left: 0;
   }
 
