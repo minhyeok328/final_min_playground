@@ -2084,6 +2084,7 @@ button,
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2095,6 +2096,7 @@ button,
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2102,10 +2104,12 @@ button,
 }
 
 @keyframes float-panel {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -2116,6 +2120,7 @@ button,
     opacity: 0;
     transform: translateY(10px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -2167,6 +2172,7 @@ button,
 }
 
 @media (max-width: 991px) {
+
   .sidebar,
   .shell>.ant-layout-sider {
     display: none !important;
@@ -2559,6 +2565,7 @@ button,
 }
 
 @media (max-width: 420px) {
+
   .dashboard-hero,
   .page-title,
   .ant-card .ant-card-body {
@@ -2580,6 +2587,7 @@ button,
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
