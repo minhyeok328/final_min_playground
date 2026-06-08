@@ -72,6 +72,37 @@ async function assertNoHorizontalOverflow(page, label) {
   }
 }
 
+async function assertPinnedToViewport(page, locator, label, expectedInset) {
+  await locator.evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: false }).map((animation) => animation.finished.catch(() => undefined))),
+  );
+
+  const box = await locator.boundingBox();
+  const viewport = page.viewportSize();
+
+  if (!box || !viewport) {
+    throw new Error(`${label} 영역을 찾지 못했습니다.`);
+  }
+
+  const actualRight = viewport.width - box.x - box.width;
+  const actualBottom = viewport.height - box.y - box.height;
+  const tolerance = expectedInset.tolerance ?? 2;
+
+  if (
+    Math.abs(actualRight - expectedInset.right) > tolerance ||
+    Math.abs(actualBottom - expectedInset.bottom) > tolerance
+  ) {
+    throw new Error(
+      `${label}이 우측 하단에 고정되지 않았습니다. expected=${JSON.stringify(expectedInset)} actual=${JSON.stringify({
+        right: actualRight,
+        bottom: actualBottom,
+      })}`,
+    );
+  }
+
+  return box;
+}
+
 async function verifyDesktopWidget(page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${baseUrl}/#/dashboard`, { waitUntil: 'networkidle' });
@@ -88,48 +119,17 @@ async function verifyDesktopWidget(page) {
 
   const fab = page.locator('.document-chat-fab');
   await fab.waitFor({ state: 'visible', timeout: 5000 });
-
-  const fabBefore = await fab.boundingBox();
-  if (!fabBefore) {
-    throw new Error('접힌 채팅 FAB 영역을 찾지 못했습니다.');
-  }
-
-  await page.mouse.move(fabBefore.x + fabBefore.width / 2, fabBefore.y + fabBefore.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(fabBefore.x - 220, fabBefore.y - 130, { steps: 8 });
-  await page.mouse.up();
-
-  const fabAfter = await fab.boundingBox();
-  if (!fabAfter || (Math.abs(fabAfter.x - fabBefore.x) < 20 && Math.abs(fabAfter.y - fabBefore.y) < 20)) {
-    throw new Error(`접힌 채팅 FAB가 드래그 후 움직이지 않았습니다. before=${JSON.stringify(fabBefore)} after=${JSON.stringify(fabAfter)}`);
-  }
-
-  const openedByDrag = await page.locator('.document-chat-widget').count();
-  if (openedByDrag > 0) {
-    throw new Error('접힌 FAB를 드래그하는 동안 채팅 위젯이 열렸습니다.');
-  }
+  await assertPinnedToViewport(page, fab, '접힌 채팅 FAB', { right: 28, bottom: 28 });
 
   await fab.click();
   const widget = page.locator('.document-chat-widget');
-  const dragHandle = page.locator('.document-chat-widget-drag-handle');
 
   await widget.waitFor({ state: 'visible', timeout: 5000 });
-  await dragHandle.waitFor({ state: 'visible', timeout: 5000 });
+  await assertPinnedToViewport(page, widget, '채팅 위젯', { right: 28, bottom: 28 });
 
-  const before = await widget.boundingBox();
-  const handleBox = await dragHandle.boundingBox();
-  if (!before || !handleBox) {
-    throw new Error('드래그 가능한 위젯 영역을 찾지 못했습니다.');
-  }
-
-  await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(handleBox.x - 140, handleBox.y + 110, { steps: 8 });
-  await page.mouse.up();
-
-  const after = await widget.boundingBox();
-  if (!after || (Math.abs(after.x - before.x) < 20 && Math.abs(after.y - before.y) < 20)) {
-    throw new Error(`드래그 후 위젯 위치가 충분히 바뀌지 않았습니다. before=${JSON.stringify(before)} after=${JSON.stringify(after)}`);
+  const dragHandleCount = await page.locator('.document-chat-widget-drag-handle').count();
+  if (dragHandleCount > 0) {
+    throw new Error('고정형 채팅 위젯에 드래그 핸들이 남아 있습니다.');
   }
 
   await assertNoHorizontalOverflow(page, 'desktop widget');
@@ -139,15 +139,16 @@ async function verifyDesktopWidget(page) {
 async function verifyMobileWidget(page) {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${baseUrl}/#/dashboard`, { waitUntil: 'networkidle' });
-  await page.locator('.document-chat-fab').click();
+  const fab = page.locator('.document-chat-fab');
+
+  await fab.waitFor({ state: 'visible', timeout: 5000 });
+  await assertPinnedToViewport(page, fab, '모바일 채팅 FAB', { right: 16, bottom: 16 });
+  await fab.click();
 
   const widget = page.locator('.document-chat-widget');
   await widget.waitFor({ state: 'visible', timeout: 5000 });
 
-  const box = await widget.boundingBox();
-  if (!box) {
-    throw new Error('모바일 위젯 영역을 찾지 못했습니다.');
-  }
+  const box = await assertPinnedToViewport(page, widget, '모바일 채팅 위젯', { right: 12, bottom: 12 });
 
   if (box.x < -1 || box.y < -1 || box.x + box.width > 391 || box.y + box.height > 845) {
     throw new Error(`모바일 위젯이 뷰포트 밖으로 벗어났습니다: ${JSON.stringify(box)}`);
