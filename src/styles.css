@@ -215,7 +215,7 @@ button,
 }
 
 .side-label {
-  margin: 0 0 6px 8px;
+  margin: 0 0 2px 8px;
   color: rgba(255, 255, 255, 0.66);
   font-size: 12px;
   font-weight: 800;
@@ -229,8 +229,8 @@ button,
   gap: 12px;
   align-items: center;
   width: 100%;
-  min-height: 58px;
-  padding: 9px 10px;
+  min-height: 54px;
+  padding: 8px 10px;
   color: rgba(255, 255, 255, 0.8);
   text-align: left;
   border: 1px solid transparent;
