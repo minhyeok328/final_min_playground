@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { Layout } from 'antd';
-import { SidebarNav } from './SidebarNav';
-import { TopHeader } from './TopHeader';
-import type { NotificationsData } from '../../api/adapters';
+import { MobileShellHeader, SidebarNav } from './SidebarNav';
+import type { UserProfile } from '../../api/adapters';
 import type { AppRoute } from '../../data/mockData';
 import type { Navigate, ShowAlert } from '../../types/app';
 
@@ -14,7 +13,7 @@ type AppShellProps = {
   assistantFab?: ReactNode;
   themeSwitch: ReactNode;
   creditPercent: number;
-  notifications?: NotificationsData;
+  profile?: UserProfile;
   navigate: Navigate;
   showAlert: ShowAlert;
 };
@@ -25,15 +24,29 @@ export function AppShell({
   assistantFab,
   themeSwitch,
   creditPercent,
-  notifications,
+  profile,
   navigate,
   showAlert,
 }: AppShellProps) {
   return (
     <Layout className="shell">
-      <SidebarNav route={route} creditPercent={creditPercent} navigate={navigate} showAlert={showAlert} />
+      <SidebarNav
+        route={route}
+        creditPercent={creditPercent}
+        profile={profile}
+        themeSwitch={themeSwitch}
+        navigate={navigate}
+        showAlert={showAlert}
+      />
       <Layout>
-        <TopHeader route={route} themeSwitch={themeSwitch} notifications={notifications} navigate={navigate} />
+        <MobileShellHeader
+          route={route}
+          creditPercent={creditPercent}
+          profile={profile}
+          themeSwitch={themeSwitch}
+          navigate={navigate}
+          showAlert={showAlert}
+        />
         <Content className="content">
           <div className="content-frame" key={route}>
             {children}

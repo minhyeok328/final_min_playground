@@ -359,7 +359,7 @@ export default function App() {
               }
               themeSwitch={themeSwitch}
               creditPercent={data?.dashboard.creditPercent ?? 0}
-              notifications={data?.notifications}
+              profile={data?.userProfile}
               navigate={navigate}
               showAlert={showAlert}
             >
