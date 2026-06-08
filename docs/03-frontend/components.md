@@ -48,7 +48,7 @@
 
 | 파일 | 기능 |
 |------|------|
-| `DocumentChatFab.tsx` | 전역 AI 문서 검색 FAB·플로팅 위젯 (드래그·위치 저장) |
+| `DocumentChatFab.tsx` | 전역 AI 문서 검색 FAB·우측 하단 고정 위젯 |
 | `DocumentSearchContextPanel.tsx` | `#/chat` 검색 범위·문서 컬렉션·빠른 질문 |
 | `ChatWindowPanel.tsx` | 메시지 목록 + 입력 (문서 검색·리포트 공용) |
 | `ReportContextPanel.tsx` | (레거시) 리포트 탭·예시 질문 — 현재 `ChatPage`에서 미사용 |
