@@ -181,14 +181,18 @@ button,
 }
 
 .brand-button {
-  width: 100%;
+  /* width: 100%;
   min-height: 58px;
   padding: 10px 12px;
   border-radius: 18px;
   background: rgba(24, 56, 114, 0.18);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-    0 14px 34px rgba(24, 56, 114, 0.18);
+    0 14px 34px rgba(24, 56, 114, 0.18); */
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .brand-button img {
