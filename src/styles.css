@@ -203,11 +203,12 @@ button,
 }
 
 .side-section {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
-  margin-top: 26px;
+  margin-top: 18px;
   padding: 0 2px 18px 0;
   overflow: auto;
   scrollbar-width: thin;
