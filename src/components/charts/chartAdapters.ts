@@ -31,7 +31,7 @@ export function toDonutChartOption(data: DonutSummaryData, theme: ChartThemeToke
       borderColor: theme.border,
       textStyle: {
         color: theme.text,
-        fontFamily: 'Pretendard, Noto Sans KR, system-ui, sans-serif',
+        fontFamily: '"Noto Sans KR Clean", "Noto Sans KR", system-ui, sans-serif',
       },
       valueFormatter: (value) => `${value}%`,
     },
