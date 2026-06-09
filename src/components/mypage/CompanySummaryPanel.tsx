@@ -21,7 +21,7 @@ export function CompanySummaryPanel({ company, navigate }: CompanySummaryPanelPr
           <Statistic title="회사명" value={company.name} />
         </Col>
         <Col xs={24} md={8}>
-          <Statistic title="규모" value={company.size} />
+          <Statistic title="직원 수" value={company.employeeCount} suffix="명" />
         </Col>
         <Col xs={24} md={8}>
           <Progress percent={company.completion} strokeColor={palette.accent} />
