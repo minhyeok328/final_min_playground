@@ -32,16 +32,16 @@ final_min_playground/
 ```text
 src/
 ├── main.tsx                    # React 루트, antd reset.css, styles.css
-├── App.tsx                     # 해시 라우트, 테마, mock 액션, DocumentChatFab 연동
+├── App.tsx                     # 해시 라우트, 테마, API 액션, DocumentChatFab 연동
 ├── styles.css                  # CSS 변수·셸·대시보드·위젯·다크모드 전역 스타일
 ├── api/
 │   ├── adapters.ts             # API snake_case → UI 모델
-│   └── mockClient.ts           # 목 API (→ Django HTTP로 교체 예정)
+│   └── backendClient.ts        # backend 명세 기반 fetch/CSRF 클라이언트
 ├── data/
 │   ├── apiMockData.ts          # Django 응답 JSON 계약 샘플
 │   └── mockData.tsx            # AppRoute, mainMenu, authMenu, palette
 ├── hooks/
-│   └── useMockAppData.ts       # 초기 GET 12건 병렬 로드
+│   └── useMockAppData.ts       # 초기 API 데이터 로드·정규화
 ├── pages/                      # 화면 단위 컨테이너
 │   ├── DashboardPage.tsx
 │   ├── CompanyPage.tsx
@@ -64,7 +64,7 @@ src/
 │   ├── recruitment/
 │   └── charts/                 # EChart, DonutChart, chartAdapters, chartTheme
 ├── types/
-│   └── app.ts                  # ThemeMode, AlertState, RunMockAction, …
+│   └── app.ts                  # ThemeMode, AlertState, RunApiAction, …
 └── utils/
     ├── routes.ts               # 해시 → AppRoute, authRoutes
     └── statusTag.tsx           # status_code → Ant Design Tag
