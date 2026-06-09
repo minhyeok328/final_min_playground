@@ -45,22 +45,42 @@ export function CoverLetterUploadPanel({
       </Dragger>
       <Divider />
       {coverUploaded ? (
-        <Table
-          pagination={false}
-          scroll={{ x: 520 }}
-          dataSource={coverRows}
-          rowClassName={(record) => (record.statusCode === 'missing_answer' ? 'warning-row' : '')}
-          columns={[
-            { title: '지원자', dataIndex: 'applicant' },
-            { title: 'JD', dataIndex: 'jd' },
-            {
-              title: '상태',
-              dataIndex: 'status',
-              render: (_value: string, record) => statusTag(record.status, record.statusCode),
-            },
-            { title: '점수', dataIndex: 'score' },
-          ]}
-        />
+        <>
+          <Table
+            className="desktop-data-table"
+            pagination={false}
+            scroll={{ x: 520 }}
+            dataSource={coverRows}
+            rowClassName={(record) => (record.statusCode === 'missing_answer' ? 'warning-row' : '')}
+            columns={[
+              { title: '지원자', dataIndex: 'applicant' },
+              { title: 'JD', dataIndex: 'jd' },
+              {
+                title: '상태',
+                dataIndex: 'status',
+                render: (_value: string, record) => statusTag(record.status, record.statusCode),
+              },
+              { title: '점수', dataIndex: 'score' },
+            ]}
+          />
+          <div className="mobile-data-list" aria-label="Cover letter upload list">
+            {coverRows.map((row) => (
+              <article className={`mobile-data-card ${row.statusCode === 'missing_answer' ? 'warning' : ''}`} key={row.key}>
+                <div className="mobile-data-card-head">
+                  <div>
+                    <strong>{row.applicant}</strong>
+                    <span>{row.jd}</span>
+                  </div>
+                  {statusTag(row.status, row.statusCode)}
+                </div>
+                <div className="mobile-data-score">
+                  <span>Score</span>
+                  <strong>{row.score}</strong>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
       ) : (
         <EmptyState description="업로드된 자기소개서가 없습니다." />
       )}
