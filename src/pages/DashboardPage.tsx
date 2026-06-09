@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Col, Row, type RowProps } from 'antd';
 import { AnalysisSummaryPanel } from '../components/dashboard/AnalysisSummaryPanel';
 import { ApplicantReviewTable } from '../components/dashboard/ApplicantReviewTable';
 import { DashboardHero } from '../components/dashboard/DashboardHero';
@@ -6,6 +6,11 @@ import { DashboardMetrics } from '../components/dashboard/DashboardMetrics';
 import { TaskListPanel } from '../components/dashboard/TaskListPanel';
 import type { DashboardData } from '../api/adapters';
 import type { Navigate, ShowAlert, ThemeMode } from '../types/app';
+
+const dashboardGutter: RowProps['gutter'] = [
+  { xs: 16, lg: 22, xl: 24 },
+  { xs: 16, lg: 22, xl: 24 },
+];
 
 type DashboardPageProps = {
   dashboard: DashboardData;
@@ -22,7 +27,7 @@ export function DashboardPage({ dashboard, mode, navigate, showAlert, reloadData
 
       <DashboardMetrics metrics={dashboard.metrics} />
 
-      <Row gutter={[22, 22]} className="section-row">
+      <Row gutter={dashboardGutter} className="section-row">
         <Col xs={24} xl={15}>
           <ApplicantReviewTable applicants={dashboard.applicants} showAlert={showAlert} />
         </Col>
