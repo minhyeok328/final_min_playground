@@ -39,7 +39,7 @@
 - Ant Design 토큰: `palette` 기반 primary/accent, `borderRadius: 12`, Card/Button/Input radius
 - CSS 변수: [`src/styles.css`](../../src/styles.css) — `--primary`, `--shadow`, `--radius`, `--content-max` 등
 - JS 팔레트: [`src/data/mockData.tsx`](../../src/data/mockData.tsx) `palette` (primary `#2563EB`, accent `#14B8A6` 등)
-- 폰트: `Pretendard, Noto Sans KR, system-ui, sans-serif`
+- 폰트: `Noto Sans KR Clean, Noto Sans KR, system-ui, sans-serif`
 - 로고·아이콘: [`public/assets/`](../../public/assets/) — `/assets/humour-logo-*.png`, `humour-app-icon.png`
 - 전역 스타일: 사이드바, 인증 카드, 대시보드 히어로, 문서 검색 위젯, 채팅 버블 등
 

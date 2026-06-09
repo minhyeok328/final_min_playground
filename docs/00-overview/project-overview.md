@@ -44,7 +44,7 @@ SKN26 파이널 **HumouR** 채용 보조 서비스의 **UI 고도화·레이아�
 | 차트 | ECharts 6 (`src/components/charts/`) |
 | 라우팅 | 해시 (`src/utils/routes.ts`, `src/data/mockData.tsx`) |
 | 스타일 | `src/styles.css` (CSS 변수·컴포넌트 클래스), Ant Design 토큰 (`App.tsx`) |
-| 폰트 | Pretendard, Noto Sans KR (테마 `fontFamily`) |
+| 폰트 | Noto Sans KR Clean, Noto Sans KR (테마 `fontFamily`) |
 | UI 검증 | Playwright Core (`scripts/verify-document-chat-widget.mjs`) |
 
 ## 정적 자산
