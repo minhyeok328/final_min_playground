@@ -2,15 +2,22 @@ import { Tag } from 'antd';
 import type { StatusCode } from '../data/apiMockData';
 
 const statusColorByCode: Partial<Record<StatusCode, string>> = {
-  analysis_done: 'green',
-  interview_recommended: 'green',
-  valid: 'green',
+  reviewed: 'green',
+  subscribe_active: 'green',
+  grade_a: 'green',
+  grade_b: 'blue',
+  done: 'green',
   normal: 'green',
-  analysis_pending: 'blue',
-  needs_followup: 'blue',
-  draft: 'default',
-  missing_answer: 'orange',
-  on_hold: 'gold',
+  processing: 'blue',
+  on_going: 'blue',
+  prepare: 'default',
+  onqueue: 'gold',
+  needs_review: 'gold',
+  grade_c: 'gold',
+  grade_d: 'orange',
+  grade_f: 'red',
+  closed: 'default',
+  subscribe_expired: 'default',
 };
 
 export function statusTag(label: string, statusCode?: StatusCode) {
