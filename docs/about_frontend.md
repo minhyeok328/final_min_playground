@@ -1,7 +1,7 @@
 # 프론트엔드·백엔드 협업 참고 (일반)
 
 > **이 문서는 팀 학습용 일반 가이드입니다.**  
-> **HumouR UI 고도화 목업**(`final_min_playground`)은 실제 HTTP·Axios 없이 [`mockClient`](../src/api/mockClient.ts) + [`apiMockData.ts`](../src/data/apiMockData.ts)로 API 계약만 연습합니다.  
+> **HumouR UI 고도화 목업**(`final_min_playground`)은 현재 [`backendClient`](../src/api/backendClient.ts)로 backend 명세의 `/api/{endpoint}/` 호출을 수행하고, 명세가 부족한 영역만 [`apiMockData.ts`](../src/data/apiMockData.ts) 샘플로 보완합니다.  
 > 레포 실행·화면별 JSON 계약은 [docs/README.md](./README.md) · [08-features](./08-features/README.md)를 보세요.
 
 ---

@@ -1,11 +1,11 @@
 # HumouR 프론트엔드 문서 (wiki)
 
 **HumouR** UI 고도화·목업 저장소(`final_min_playground`)의 프론트엔드 전용 문서입니다.  
-실제 Django 서버 없이도, 각 화면이 기대하는 **JSON API 형태**와 **관련 소스 파일 역할**을 코드 기준으로 정리했습니다.
+각 화면이 기대하는 **Django JSON API 형태**와 **관련 소스 파일 역할**을 코드 기준으로 정리했습니다.
 
-> **저장소 목적:** 백엔드 없이 UI·레이아웃·컴포넌트·테마·인터랙션을 연습·고도화하는 샌드박스입니다.  
-> **실제 HTTP 호출 없음** — `mockClient`가 [`apiMockData.ts`](../src/data/apiMockData.ts) 샘플을 지연 반환합니다.  
-> Django 연동 시 URL·인증은 메인 프로젝트와 맞추고, 응답 **`data` 필드의 snake_case** 는 이 목업을 기준으로 하면 [`adapters.ts`](../src/api/adapters.ts)를 재사용할 수 있습니다.
+> **저장소 목적:** UI·레이아웃·컴포넌트·테마·인터랙션을 Django API 명세에 맞춰 검증하는 프론트 샌드박스입니다.  
+> **API 호출:** [`backendClient.ts`](../src/api/backendClient.ts)가 `/api/csrf/`로 CSRF 쿠키를 받은 뒤 `/api/{endpoint}/`에 쿠키 기반 POST 요청을 보냅니다.  
+> 응답 **`data` 필드의 snake_case** 는 [`adapters.ts`](../src/api/adapters.ts)에서 화면용 데이터로 변환합니다.
 
 ## 읽는 순서
 
@@ -15,7 +15,7 @@
 | [01-getting-started](./01-getting-started/development-environment.md) | 설치·실행·검증 스크립트 |
 | [02-architecture](./02-architecture/) | 디렉터리, 데이터 흐름, 공통 API 래퍼 |
 | [03-frontend](./03-frontend/) | 라우팅, 컴포넌트 계층, 테마·차트·플로팅 위젯 |
-| [06-api](./06-api/api-reference.md) | 전역 API 목록·공통 응답 형식 |
+| [06-api](./06-api/api-reference.md) | 백엔드 API 호출·공통 응답 형식·추가 명세 필요 항목 |
 | [08-features](./08-features/) | **페이지별** Django JSON + 파일 맵 |
 
 ## UI 고도화 설계·계획 (에이전트 산출물)
@@ -44,12 +44,12 @@
 
 | 파일 | 역할 |
 |------|------|
-| [`src/data/apiMockData.ts`](../src/data/apiMockData.ts) | Django가 맞춰야 할 **응답 JSON 스키마** 샘플 |
-| [`src/api/mockClient.ts`](../src/api/mockClient.ts) | 화면에서 호출하는 **메서드 = 예상 API 동작** (목) |
+| [`src/data/apiMockData.ts`](../src/data/apiMockData.ts) | API 타입과 로컬 기본값 샘플 |
+| [`src/api/backendClient.ts`](../src/api/backendClient.ts) | Django API 호출, CSRF 처리, 일부 화면용 조합 |
 | [`src/api/adapters.ts`](../src/api/adapters.ts) | snake_case API → UI용 camelCase 변환 |
 | [`src/data/mockData.tsx`](../src/data/mockData.tsx) | `AppRoute`, 메뉴, `palette`, 채팅 타입 |
-| [`src/hooks/useMockAppData.ts`](../src/hooks/useMockAppData.ts) | 앱 기동 시 GET 12건 일괄 로드 |
-| [`src/App.tsx`](../src/App.tsx) | 해시 라우팅, 라이트/다크, `runMockAction`, `DocumentChatFab` |
+| [`src/hooks/useMockAppData.ts`](../src/hooks/useMockAppData.ts) | 앱 기동 시 API 결과를 조합해 화면 데이터 생성 |
+| [`src/App.tsx`](../src/App.tsx) | 해시 라우팅, 라이트/다크, 액션 실행, `DocumentChatFab` |
 | [`src/styles.css`](../src/styles.css) | CSS 디자인 토큰, 셸·대시보드·위젯 스타일 |
 | [`public/assets/`](../public/assets/) | 로고·파비콘 (`humour-logo-*.png`, `humour-app-icon.png`) |
 
@@ -57,6 +57,6 @@
 
 | 문서 | 내용 |
 |------|------|
-| [about_frontend.md](./about_frontend.md) | 프론트엔드·백엔드 협업 일반 (Axios, CORS, JWT 등). **이 레포 구현과 1:1 대응하지 않음** — HumouR 목업은 `mockClient` 패턴을 사용합니다. |
+| [about_frontend.md](./about_frontend.md) | 프론트엔드·백엔드 협업 일반 (Axios, CORS, JWT 등). **이 레포 구현과 1:1 대응하지 않음** — HumouR는 현재 CSRF 쿠키 기반 `fetch` 클라이언트를 사용합니다. |
 
 루트 [README.md](../README.md)에 실행 방법·저장소 요약이 있습니다.

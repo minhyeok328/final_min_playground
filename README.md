@@ -7,13 +7,13 @@
 | **과정** | SKN26 파이널 프로젝트 |
 
 SKN26 파이널 **HumouR** 채용·지원자 분석 보조 서비스의 **UI 고도화·디자인 연습** 저장소입니다.  
-실제 백엔드·인증·DB 연동 없이, 화면 구성·레이아웃·컴포넌트·라이트/다크 테마·차트·플로팅 위젯 등 **프론트엔드 UI를 빠르게 시도하고 다듬는 샌드박스** 역할을 합니다.
+화면 구성·레이아웃·컴포넌트·라이트/다크 테마·차트·플로팅 위젯을 다듬으면서, 현재는 backend 명세의 `/api/{endpoint}/` 호출 구조에 맞춰 연동 형태를 맞추고 있습니다.
 
 ## 목적
 
 - **HumouR** 화면 흐름을 미리 구현하고, 운영형 SaaS 수준의 **비주얼·인터랙션**을 검증합니다.
 - Ant Design + ECharts + CSS 디자인 토큰으로 카드, 테이블, 폼, 대시보드, AI 문서 검색 위젯 등 **실사용에 가까운 목업**을 만듭니다.
-- Django 연동을 가정한 **JSON API 계약**(snake_case)을 목 데이터로 고정해, 메인 프로젝트와 필드명·래퍼를 맞출 수 있게 합니다.
+- backend 명세의 **JSON API 계약**(snake_case, `{ error, data, message }`)에 맞춰 메인 프로젝트와 필드명·래퍼를 맞출 수 있게 합니다.
 - 이 레포에서 검증한 레이아웃·토큰·패턴을 HumouR 메인 프로젝트에 옮깁니다.
 
 ## UI 고도화 범위 (현재)
@@ -37,19 +37,17 @@ SKN26 파이널 **HumouR** 채용·지원자 분석 보조 서비스의 **UI 고
 
 라우트·사이드 메뉴 정의: [`src/data/mockData.tsx`](./src/data/mockData.tsx).
 
-## 데이터·API (목업)
-
-**실제 HTTP 요청은 없습니다.** 앱이 Django JSON 형태를 흉내 냅니다.
+## 데이터·API (backend 연동)
 
 | 파일 | 역할 |
 |------|------|
-| [`src/data/apiMockData.ts`](./src/data/apiMockData.ts) | Django가 맞춰야 할 **응답 JSON 샘플** (`ApiResponse`, snake_case `data`) |
-| [`src/api/mockClient.ts`](./src/api/mockClient.ts) | 지연 후 샘플을 반환하는 **목 API** (연동 시 `fetch`/axios로 교체) |
+| [`src/api/backendClient.ts`](./src/api/backendClient.ts) | backend 명세의 `/api/csrf/`, `/api/login/`, `/api/account/get/` 등 실제 endpoint 호출 |
+| [`src/data/apiMockData.ts`](./src/data/apiMockData.ts) | backend 응답이 비었거나 명세가 부족한 영역을 보완하는 로컬 샘플 데이터 |
 | [`src/api/adapters.ts`](./src/api/adapters.ts) | API snake_case → UI용 camelCase |
-| [`src/hooks/useMockAppData.ts`](./src/hooks/useMockAppData.ts) | 기동 시 GET 12건 병렬 로드 |
+| [`src/hooks/useMockAppData.ts`](./src/hooks/useMockAppData.ts) | 기동 시 dashboard 구성 데이터 로드·정규화 |
 | [`src/data/mockData.tsx`](./src/data/mockData.tsx) | 라우트·메뉴·색상 팔레트·채팅 타입 |
 
-폼 저장·로그인 등 mutation은 입력값을 서버로 보내지 않고, `mockClient`가 성공 메시지만 반환합니다.
+공통 규칙은 [`docs/06-api/api-reference.md`](./docs/06-api/api-reference.md)에 정리했습니다. backend 명세에 아직 없는 기능은 [`docs/06-api/api-spec-addendum.md`](./docs/06-api/api-spec-addendum.md)에 추가본으로 분리했습니다.
 
 ## 기술 스택
 
@@ -65,8 +63,8 @@ SKN26 파이널 **HumouR** 채용·지원자 분석 보조 서비스의 **UI 고
 final_min_playground/
 ├── public/assets/              # HumouR 로고·앱 아이콘 (PNG)
 ├── src/
-│   ├── App.tsx                 # 해시 라우팅, 테마, mock 액션, DocumentChatFab 연동
-│   ├── api/                    # mockClient, adapters
+│   ├── App.tsx                 # 해시 라우팅, 테마, API 액션, DocumentChatFab 연동
+│   ├── api/                    # backendClient, adapters
 │   ├── data/                   # apiMockData, mockData
 │   ├── hooks/                  # useMockAppData
 │   ├── pages/                  # 화면 단위
