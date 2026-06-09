@@ -1,46 +1,58 @@
-# API 레퍼런스 (목업 계약)
+# API 레퍼런스
 
-Django 구현 시 아래 **JSON `data` 구조**를 기준으로 맞춥니다.  
-**URL 경로**는 제안안이며, 실제 메인 백엔드와 통일해야 합니다 (**needs verification**).
+프론트는 백엔드 명세의 Django 엔드포인트를 [`src/api/backendClient.ts`](../../src/api/backendClient.ts)에서 호출합니다.
 
-공통 래퍼: [api-envelope.md](../02-architecture/api-envelope.md).
+기본 규칙:
 
-## GET — 초기 로드 (`useMockAppData`)
+- API prefix: `/api/`
+- CSRF 발급: `GET /api/csrf/`
+- 인증: 브라우저 쿠키 기반, 모든 API 호출에 `credentials: "include"` 사용
+- JSON POST 호출: `Content-Type: application/json`, `X-CSRFToken` 헤더 포함
+- 데이터 응답: `{ "error": false, "data": ... }`
+- 에러 응답: `{ "error": true, "message": "..." }`
 
-| mockClient | 제안 메서드·경로 | `data` 타입 참조 |
-|------------|------------------|------------------|
-| `getDashboard` | `GET /api/v1/dashboard/` | `dashboardApiResponse` |
-| `getCompanyProfile` | `GET /api/v1/companies/me/` | `companyApiResponse` |
-| `getCompanyChoices` | `GET /api/v1/companies/choices/` | `companyChoicesApiResponse` |
-| `getJobDescriptions` | `GET /api/v1/job-descriptions/` | `jobDescriptionsApiResponse` |
-| `getCoverLetterDraft` | `GET /api/v1/cover-letters/draft/` | `coverLetterDraftApiResponse` |
-| `getCoverLetters` | `GET /api/v1/cover-letters/` | `coverLettersApiResponse` |
-| `getAnalysisReport` | `GET /api/v1/analysis-reports/current/` | `analysisReportApiResponse` |
-| `getRecruitmentPreview` | `GET /api/v1/recruitment-posts/preview/` | `recruitmentPostApiResponse` |
-| `getCoverLetterTemplate` | `GET /api/v1/cover-letter-templates/` | `coverLetterTemplateApiResponse` |
-| `getUserProfile` | `GET /api/v1/users/me/` | `userProfileApiResponse` |
-| `getNotifications` | `GET /api/v1/notifications/` | `notificationsApiResponse` |
-| `getAuthDefaults` | `GET /api/v1/auth/defaults/` | `authDefaultsApiResponse` |
+공통 응답 처리: [api-envelope.md](../02-architecture/api-envelope.md).
 
-샘플 전문: [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts).
+## 클라이언트 메서드 매핑
 
-## POST / PATCH — 사용자 액션
+| 프론트 메서드 | 실제 호출 엔드포인트 | 비고 |
+|---------------|----------------------|------|
+| `getDashboard` | `account/get`, `compinfo/get`, `jd/get`, `resume/get`, `report/get`, `question/get` 조합 | 대시보드 전용 API가 없어 프론트에서 집계 |
+| `getCompanyProfile` | `compinfo/get` | 로그인 계정의 회사 정보 |
+| `getJobDescriptions` | `jd/get` | 로그인 계정의 JD 목록 |
+| `getCoverLetterDraft` | `jd/get` → `resume/get` | 첫 지원서를 입력 초안으로 사용 |
+| `getCoverLetters` | `jd/get` → `resume/get` | 전체 JD의 지원서 목록을 합침 |
+| `getAnalysisReport` | `report/get` | 첫 지원서 리포트를 현재 리포트로 사용 |
+| `getCoverLetterTemplate` | `question/get` | 면접 질문 목록 |
+| `getUserProfile` | `account/get` | 백엔드 응답에 없는 `username` 등은 로컬 기본값으로 보완 |
+| `getAuthDefaults` | 로컬 기본값 | 백엔드 명세에 기본값 API 없음 |
+| `login` | `login` | `username`, `password` 전송 |
+| `completeSignup` | `signin` | 회원가입 필드 전송 |
+| `logout` | `logout` | 현재 UI에는 직접 연결 전 |
+| `saveCompanyProfile` | `compinfo/modify` | 현재 저장 버튼은 빈 수정 body 전송 |
+| `saveUserProfile` | `account/modify` | 현재 저장 버튼은 빈 수정 body 전송 |
+| `requestJobAnalysis` | `resume/analize` | JD에 연결된 첫 지원서를 분석 요청 |
+| `requestCoverLetterAnalysis` | `resume/analize` | 선택 JD의 첫 지원서를 분석 요청 |
+| `uploadCoverLetters` | `jd/get` → `resume/get` | 업로드 전용 명세가 없어 목록 재조회로 대체 |
 
-| mockClient | 제안 메서드·경로 | 요청 body (권장) | 응답 `data` (목업) |
-|------------|------------------|------------------|---------------------|
-| `login` | `POST /api/v1/auth/login/` | 아래 auth 문서 | `{ "authenticated": true }` |
-| `checkSignupId` | `POST /api/v1/auth/signup/check-username/` | `{ "username": "..." }` | `{ "available": true }` |
-| `completeSignup` | `POST /api/v1/auth/signup/` | signup 필드 | `{ "created": true }` |
-| `resetPassword` | `POST /api/v1/auth/password-reset/` | reset 필드 | `{ "reset": true }` |
-| `saveCompanyProfile` | `PATCH /api/v1/companies/me/` | company 필드 | `{ "updated_at": "ISO8601" }` |
-| `requestJobAnalysis` | `POST /api/v1/job-descriptions/{id}/analyze/` | 없음 또는 `{}` | `{ "jd_id": "..." }` |
-| `uploadCoverLetters` | `POST /api/v1/cover-letters/upload/` | `multipart/form-data` file | `{ "uploaded_count": N }` |
-| `requestCoverLetterAnalysis` | `POST /api/v1/cover-letters/analyze/` | `{ "jd_id": "..." }` | `{ "jd_id": "..." }` |
-| `sendChatMessage` | `POST /api/v1/analysis-reports/{id}/chat/` | `{ "question": "..." }` | `{ "role": "assistant", "text": "..." }` |
-| `saveUserProfile` | `PATCH /api/v1/users/me/` | profile 필드 | `{ "updated_at": "ISO8601" }` |
-| `generateRecruitmentPost` | `POST /api/v1/recruitment-posts/generate/` | `{ "jd_ids": ["..."] }` | `{ "jd_ids": [...] }` |
-| `downloadRecruitmentPdf` | `GET /api/v1/recruitment-posts/export/pdf/` | query 또는 body TBD | `{ "file_name": "..." }` |
-| `generateCoverLetterTemplate` | `POST /api/v1/cover-letter-templates/generate/` | `{ "jd_id": "..." }` | `{ "jd_id": "..." }` |
-| `downloadTemplateDocument` | `GET /api/v1/cover-letter-templates/export/` | TBD | `{ "file_name": "..." }` |
+## 인증/CSRF
 
-페이지별 상세·파일 맵: [08-features](../08-features/README.md).
+[`backendClient.ts`](../../src/api/backendClient.ts)는 다음 흐름을 공통 처리합니다.
+
+1. 쿠키에서 `csrftoken` 확인
+2. 없으면 `GET /api/csrf/` 호출
+3. POST 요청에 `X-CSRFToken` 헤더 추가
+4. 모든 요청에 `credentials: "include"` 추가
+
+## 화면용 파생 데이터
+
+프론트는 DB/API에 없는 표시용 필드를 [`src/api/adapters.ts`](../../src/api/adapters.ts)에서만 계산합니다.
+
+- 대시보드 지표: `Account.credit`, `JobDescription.status`, `Resume.status/reviewed`, `AnalysisReport.overall_grade`
+- JD 평균 점수: 해당 JD에 연결된 `Resume`의 `AnalysisReport.overall_grade` 평균
+- 지원서 상태 라벨: `Resume.status`, `Resume.reviewed`
+- 리포트 탭: `AnalysisReport` 컬럼들을 화면 탭으로 묶음
+- 면접 질문/템플릿: `InterviewQuestion.question`, `InterviewQuestion.purpose`
+
+컬럼 부족/파생값 상세: [db-column-gap-notes.md](./db-column-gap-notes.md).
+추가 API 명세 필요 항목: [api-spec-addendum.md](./api-spec-addendum.md).
