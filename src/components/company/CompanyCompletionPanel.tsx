@@ -15,7 +15,7 @@ export function CompanyCompletionPanel({ company, showAlert }: CompanyCompletion
       <Progress percent={company.completion} strokeColor={palette.accent} />
       <Divider />
       <List
-        dataSource={company.benefits}
+        dataSource={company.employStyle}
         renderItem={(item) => (
           <List.Item>
             <CheckCircleOutlined className="success-icon" />

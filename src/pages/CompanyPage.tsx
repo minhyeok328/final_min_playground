@@ -5,19 +5,18 @@ import { CompanyProfileForm } from '../components/company/CompanyProfileForm';
 import { InlineLoading } from '../components/common/InlineLoading';
 import { PageTitle } from '../components/common/PageTitle';
 import { SectionCard } from '../components/common/SectionCard';
-import type { CompanyChoices, CompanyProfile } from '../api/adapters';
-import { mockClient } from '../api/mockClient';
-import type { RunMockAction, ShowAlert } from '../types/app';
+import type { CompanyProfile } from '../api/adapters';
+import { apiClient } from '../api/backendClient';
+import type { RunApiAction, ShowAlert } from '../types/app';
 
 type CompanyPageProps = {
   company: CompanyProfile;
-  companyChoices: CompanyChoices;
   loadingKey: string | null;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
   showAlert: ShowAlert;
 };
 
-export function CompanyPage({ company, companyChoices, loadingKey, runMockAction, showAlert }: CompanyPageProps) {
+export function CompanyPage({ company, loadingKey, runApiAction, showAlert }: CompanyPageProps) {
   return (
     <>
       <PageTitle
@@ -33,7 +32,7 @@ export function CompanyPage({ company, companyChoices, loadingKey, runMockAction
               type="primary"
               icon={loadingKey === 'company-save' ? undefined : <SaveOutlined />}
               disabled={loadingKey === 'company-save'}
-              onClick={() => void runMockAction('company-save', mockClient.saveCompanyProfile)}
+              onClick={() => void runApiAction('company-save', apiClient.saveCompanyProfile)}
             >
               {loadingKey === 'company-save' ? <InlineLoading label="저장 중" /> : '저장'}
             </Button>
@@ -43,7 +42,7 @@ export function CompanyPage({ company, companyChoices, loadingKey, runMockAction
       <Row gutter={[24, 24]}>
         <Col xs={24} xl={15}>
           <SectionCard title="회사 프로필">
-            <CompanyProfileForm company={company} choices={companyChoices} showAlert={showAlert} />
+            <CompanyProfileForm company={company} showAlert={showAlert} />
           </SectionCard>
         </Col>
         <Col xs={24} xl={9}>
