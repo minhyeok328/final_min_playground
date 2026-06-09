@@ -2,16 +2,16 @@ import type {
   analysisReportApiResponse,
   authDefaultsApiResponse,
   companyApiResponse,
-  companyChoicesApiResponse,
   coverLetterDraftApiResponse,
   coverLettersApiResponse,
+  coverLetterTemplateApiResponse,
   dashboardApiResponse,
   jobDescriptionsApiResponse,
-  notificationsApiResponse,
   recruitmentPostApiResponse,
   StatusCode,
   userProfileApiResponse,
 } from '../data/apiMockData';
+import type { AnalysisReport, CompanyInfo, JobDescription, InterviewQuestion, Resume } from '../data/apiMockData';
 import type { ChatMessage } from '../data/mockData';
 
 type ApiData<T> = T extends { data: infer Data } ? Data : never;
@@ -60,21 +60,11 @@ export type DashboardData = {
 
 export type CompanyProfile = {
   name: string;
-  industry: string;
-  size: string;
-  location: string;
-  introduction: string;
-  values: string[];
-  benefits: string[];
+  employeeCount: number;
+  teamComposition: string[];
+  description: string;
+  employStyle: string[];
   completion: number;
-};
-
-export type CompanyChoices = {
-  employeeSizeOptions: string[];
-  notificationChannels: {
-    value: string;
-    label: string;
-  }[];
 };
 
 export type JdItem = {
@@ -85,9 +75,13 @@ export type JdItem = {
   statusCode: StatusCode;
   fit: number;
   stack: string[];
+  preferredStack: string[];
   summary: string;
   requiredExperience: string;
   employmentType: string;
+  educationLevel: string;
+  major: string;
+  hiringReason: string;
 };
 
 export type CoverLetterDraft = {
@@ -110,7 +104,12 @@ export type AnalysisReportData = {
   reportId: string;
   applicantName: string;
   jobTitle: string;
-  tabs: ApiData<typeof analysisReportApiResponse>['tabs'];
+  tabs: {
+    key: string;
+    label: string;
+    title: string;
+    content: string;
+  }[];
   exampleQuestions: string[];
   chatMessages: ChatMessage[];
 };
@@ -124,168 +123,76 @@ export type TemplateQuestion = {
 
 export type UserProfile = {
   displayName: string;
+  username: string;
   roleName: string;
-  email: string;
-  avatarUrl: string;
   companyName: string;
-  lastLoginText: string;
-  notificationChannel: string;
-};
-
-export type NotificationItem = {
-  id: string;
-  title: string;
-  body: string;
-  createdAt: string;
-  isRead: boolean;
-};
-
-export type NotificationsData = {
-  unreadCount: number;
-  items: NotificationItem[];
+  credit: number;
+  subscribe: boolean;
+  subscribeExpirationText: string;
+  verificationQuestion: string;
 };
 
 export type AuthDefaults = ApiData<typeof authDefaultsApiResponse>;
 
-export function mapDashboard(data: ApiData<typeof dashboardApiResponse>): DashboardData {
-  const metrics = data.metrics.map((item) => ({
-    label: item.label,
-    value: item.value,
-    suffix: item.suffix,
-    change: item.delta_label,
-  }));
+const JOB_STATUS_LABEL: Record<JobDescription['status'], string> = {
+  prepare: '준비 중',
+  on_going: '진행 중',
+  closed: '마감',
+};
 
-  const creditMetric = data.metrics.find((item) => item.metric_key === 'credits');
+const RESUME_STATUS_LABEL: Record<Resume['status'], string> = {
+  onqueue: '분석 대기',
+  processing: '분석 중',
+  done: '분석 완료',
+};
 
-  return {
-    metrics,
-    applicants: data.applicants.map((item) => ({
-      key: item.id,
-      name: item.applicant_name,
-      role: item.job_title,
-      fit: item.fit_score,
-      stage: item.review_stage,
-      status: item.status_label,
-      statusCode: item.status_code,
-    })),
-    insightCards: data.insights.map((item) => ({
-      title: item.title,
-      detail: item.detail,
-      tone: item.tone,
-    })),
-    analysisSummary: {
-      centerValue: data.analysis_summary.center_value,
-      centerLabel: data.analysis_summary.center_label,
-      segments: data.analysis_summary.segments.map((segment) => ({
-        label: segment.label,
-        value: segment.value,
-        colorKey: segment.color_key,
-      })),
-    },
-    tasks: data.tasks.map((task) => task.title),
-    creditPercent: creditMetric?.value ?? 0,
-  };
+const GRADE_SCORE: Record<AnalysisReport['overall_grade'], number> = {
+  A: 94,
+  B: 82,
+  C: 68,
+  D: 46,
+  F: 20,
+};
+
+function average(values: number[]) {
+  if (!values.length) {
+    return 0;
+  }
+
+  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 }
 
-export function mapCompany(data: ApiData<typeof companyApiResponse>): CompanyProfile {
-  return {
-    name: data.name,
-    industry: data.industry,
-    size: data.employee_size,
-    location: data.location,
-    introduction: data.introduction,
-    values: data.core_values,
-    benefits: data.benefits,
-    completion: data.profile_completion,
-  };
+function creditToPercent(credit: number) {
+  return Math.min(100, Math.round((credit / 200) * 100));
 }
 
-export function mapCompanyChoices(data: ApiData<typeof companyChoicesApiResponse>): CompanyChoices {
-  return {
-    employeeSizeOptions: data.employee_size_options,
-    notificationChannels: data.notification_channels,
-  };
+function gradeToScore(grade?: AnalysisReport['overall_grade']) {
+  return grade ? GRADE_SCORE[grade] : 0;
 }
 
-export function mapJdList(data: ApiData<typeof jobDescriptionsApiResponse>): JdItem[] {
-  return data.map((item) => ({
-    id: item.id,
-    title: item.title,
-    team: item.team_name,
-    status: item.status_label,
-    statusCode: item.status_code,
-    fit: item.fit_score,
-    stack: item.tech_stacks,
-    summary: item.summary,
-    requiredExperience: item.required_experience,
-    employmentType: item.employment_type,
-  }));
+function gradeToStatusCode(grade?: AnalysisReport['overall_grade']): StatusCode {
+  return grade ? (`grade_${grade.toLowerCase()}` as StatusCode) : 'normal';
 }
 
-export function mapCoverLetterDraft(data: ApiData<typeof coverLetterDraftApiResponse>): CoverLetterDraft {
-  return {
-    applicantName: data.applicant_name,
-    body: data.body,
-    sampleFileName: data.sample_file_name,
-    uploadHint: data.upload_hint,
-  };
+function findJob(jobDescriptions: JobDescription[], resume: Resume) {
+  return jobDescriptions.find((job) => job.id === resume.job_description_id);
 }
 
-export function mapCoverLetterRows(data: ApiData<typeof coverLettersApiResponse>): CoverLetterRow[] {
-  return data.rows.map((row) => ({
-    key: row.id,
-    applicant: row.applicant_name,
-    jd: row.job_title,
-    status: row.status_label,
-    statusCode: row.status_code,
-    score: row.analysis_score,
-  }));
+function findReport(analysisReports: AnalysisReport[], resume: Resume) {
+  return analysisReports.find((report) => report.resume_id === resume.id);
 }
 
-export function mapAnalysisReport(data: ApiData<typeof analysisReportApiResponse>): AnalysisReportData {
-  return {
-    reportId: data.report_id,
-    applicantName: data.applicant_name,
-    jobTitle: data.job_title,
-    tabs: data.tabs,
-    exampleQuestions: data.example_questions,
-    chatMessages: data.chat_messages,
-  };
+function formatList(items: string[]) {
+  return items.length ? items.map((item) => `- ${item}`).join('\n') : '등록된 항목이 없습니다.';
 }
 
-export function mapTemplateQuestions(data: { questions: { title: string; guide: string }[] }): TemplateQuestion[] {
-  return data.questions.map((question) => ({
-    title: question.title,
-    guide: question.guide,
-  }));
+function formatChecklist(report: AnalysisReport) {
+  return report.checklist
+    .map((item) => `${item.result ? '충족' : '미충족'} · ${item.content}`)
+    .join('\n');
 }
 
-export function mapUserProfile(data: ApiData<typeof userProfileApiResponse>): UserProfile {
-  return {
-    displayName: data.display_name,
-    roleName: data.role_name,
-    email: data.email,
-    avatarUrl: data.avatar_url,
-    companyName: data.company_name,
-    lastLoginText: formatLastLogin(data.last_login_at),
-    notificationChannel: data.notification_channel,
-  };
-}
-
-export function mapNotifications(data: ApiData<typeof notificationsApiResponse>): NotificationsData {
-  return {
-    unreadCount: data.unread_count,
-    items: data.items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      body: item.body,
-      createdAt: item.created_at,
-      isRead: item.is_read,
-    })),
-  };
-}
-
-function formatLastLogin(isoDate: string) {
+function formatDateTime(isoDate: string) {
   const date = new Date(isoDate);
 
   if (Number.isNaN(date.getTime())) {
@@ -299,4 +206,275 @@ function formatLastLogin(isoDate: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+function mapResumeStatus(resume: Resume): { label: string; code: StatusCode } {
+  if (resume.reviewed) {
+    return { label: '검토 완료', code: 'reviewed' };
+  }
+
+  return { label: RESUME_STATUS_LABEL[resume.status], code: resume.status };
+}
+
+function getJobFit(job: JobDescription, resumes: Resume[], analysisReports: AnalysisReport[]) {
+  const relatedResumeIds = resumes
+    .filter((resume) => resume.job_description_id === job.id)
+    .map((resume) => resume.id);
+  const relatedScores = analysisReports
+    .filter((report) => relatedResumeIds.includes(report.resume_id))
+    .map((report) => gradeToScore(report.overall_grade));
+
+  return average(relatedScores);
+}
+
+export function mapDashboard(data: ApiData<typeof dashboardApiResponse>): DashboardData {
+  const reportsByResume = new Map(data.analysis_reports.map((report) => [report.resume_id, report]));
+  const applicantScores = data.resumes.map((resume) => gradeToScore(reportsByResume.get(resume.id)?.overall_grade));
+  const averageScore = average(applicantScores);
+  const activeJobs = data.job_descriptions.filter((job) => job.status === 'on_going').length;
+  const reviewedCount = data.resumes.filter((resume) => resume.reviewed).length;
+  const processingCount = data.resumes.filter((resume) => resume.status === 'processing').length;
+  const unreviewedCount = data.resumes.length - reviewedCount;
+
+  return {
+    metrics: [
+      {
+        label: '진행 중 JD',
+        value: activeJobs,
+        suffix: '건',
+        change: `전체 ${data.job_descriptions.length}건`,
+      },
+      {
+        label: '등록 지원서',
+        value: data.resumes.length,
+        suffix: '명',
+        change: `미검토 ${unreviewedCount}명`,
+      },
+      {
+        label: '분석 리포트',
+        value: data.analysis_reports.length,
+        suffix: '개',
+        change: `평균 ${averageScore}점`,
+      },
+      {
+        label: '분석 크레딧',
+        value: data.account.credit,
+        suffix: 'pt',
+        change: data.account.subscribe ? '구독 활성' : '구독 만료',
+      },
+    ],
+    applicants: data.resumes.map((resume) => {
+      const job = findJob(data.job_descriptions, resume);
+      const report = reportsByResume.get(resume.id);
+      const status = mapResumeStatus(resume);
+
+      return {
+        key: String(resume.id),
+        name: resume.name,
+        role: job?.job_name ?? '연결된 JD 없음',
+        fit: gradeToScore(report?.overall_grade),
+        stage: RESUME_STATUS_LABEL[resume.status],
+        status: report ? `${report.overall_grade} 등급` : status.label,
+        statusCode: report ? gradeToStatusCode(report.overall_grade) : status.code,
+      };
+    }),
+    insightCards: [
+      {
+        title: '채용 기준',
+        detail: `${data.company_info.company_name}는 ${data.company_info.employ_style.join(', ')}를 중요하게 봅니다.`,
+        tone: 'primary',
+      },
+      {
+        title: '분석 대기',
+        detail: processingCount ? `${processingCount}명의 지원서가 분석 중입니다.` : '현재 분석 중인 지원서는 없습니다.',
+        tone: 'accent',
+      },
+      {
+        title: '검토 필요',
+        detail: unreviewedCount ? `${unreviewedCount}명의 지원서 검토가 남아 있습니다.` : '모든 지원서가 검토되었습니다.',
+        tone: unreviewedCount ? 'warning' : 'accent',
+      },
+    ],
+    analysisSummary: {
+      centerValue: averageScore,
+      centerLabel: '평균 등급 점수',
+      segments: [
+        { label: '평균 점수', value: averageScore, colorKey: 'primary' },
+        { label: '보완 여지', value: Math.max(0, 100 - averageScore), colorKey: 'track' },
+      ],
+    },
+    tasks: [
+      unreviewedCount ? `미검토 지원서 ${unreviewedCount}명 확인` : '검토 완료 지원서 상태 재확인',
+      `진행 중 JD ${activeJobs}건 상태 점검`,
+      `분석 크레딧 ${data.account.credit}pt 잔여`,
+      `인증 키 허용 지원서 ${data.resumes.length}건 기준 확인`,
+    ],
+    creditPercent: creditToPercent(data.account.credit),
+  };
+}
+
+export function mapCompany(data: ApiData<typeof companyApiResponse>): CompanyProfile {
+  const completedFields = [
+    Boolean(data.company_name),
+    data.employee_count > 0,
+    data.team_composition.length > 0,
+    Boolean(data.company_description),
+    data.employ_style.length > 0,
+  ].filter(Boolean).length;
+
+  return {
+    name: data.company_name,
+    employeeCount: data.employee_count,
+    teamComposition: data.team_composition,
+    description: data.company_description,
+    employStyle: data.employ_style,
+    completion: Math.round((completedFields / 5) * 100),
+  };
+}
+
+export function mapJdList(
+  data: ApiData<typeof jobDescriptionsApiResponse>,
+  resumes: Resume[],
+  analysisReports: AnalysisReport[],
+): JdItem[] {
+  return data.map((item) => ({
+    id: String(item.id),
+    title: item.job_name,
+    team: `${item.education_level} · ${item.career_level}`,
+    status: JOB_STATUS_LABEL[item.status],
+    statusCode: item.status,
+    fit: getJobFit(item, resumes, analysisReports),
+    stack: item.required_skill,
+    preferredStack: item.preferred_skill,
+    summary: item.main_task,
+    requiredExperience: item.career_level,
+    employmentType: item.work_type,
+    educationLevel: item.education_level,
+    major: item.major,
+    hiringReason: item.hiring_reason,
+  }));
+}
+
+export function mapCoverLetterDraft(data: ApiData<typeof coverLetterDraftApiResponse>): CoverLetterDraft {
+  const firstIntro = data.self_intoduction[0];
+
+  return {
+    applicantName: data.name,
+    body: firstIntro ? `${firstIntro.question}\n\n${firstIntro.answer}` : '',
+    sampleFileName: 'resume_schema_sample.json',
+    uploadHint: 'Resume 컬럼 구조 기준의 목업 지원서 데이터가 표시됩니다.',
+  };
+}
+
+export function mapCoverLetterRows(
+  data: ApiData<typeof coverLettersApiResponse>,
+  jobDescriptions: JobDescription[],
+  analysisReports: AnalysisReport[],
+): CoverLetterRow[] {
+  return data.map((resume) => {
+    const job = findJob(jobDescriptions, resume);
+    const report = findReport(analysisReports, resume);
+    const status = mapResumeStatus(resume);
+
+    return {
+      key: String(resume.id),
+      applicant: resume.name,
+      jd: job?.job_name ?? '연결된 JD 없음',
+      status: status.label,
+      statusCode: status.code,
+      score: gradeToScore(report?.overall_grade),
+    };
+  });
+}
+
+export function mapAnalysisReport(
+  data: ApiData<typeof analysisReportApiResponse>,
+  resumes: Resume[],
+  jobDescriptions: JobDescription[],
+  interviewQuestions: InterviewQuestion[],
+): AnalysisReportData {
+  const resume = resumes.find((item) => item.id === data.resume_id);
+  const job = resume ? findJob(jobDescriptions, resume) : undefined;
+  const questions = interviewQuestions.filter((question) => question.resume_id === data.resume_id);
+
+  return {
+    reportId: String(data.id),
+    applicantName: resume?.name ?? '지원자 정보 없음',
+    jobTitle: job?.job_name ?? '연결된 JD 없음',
+    tabs: [
+      {
+        key: 'summary',
+        label: '요약',
+        title: `${data.overall_grade} 등급 · 종합 요약`,
+        content: `${data.overall_summary}\n\n${data.candidate_summary}`,
+      },
+      {
+        key: 'checklist',
+        label: '체크리스트',
+        title: 'JD 기준 충족 여부',
+        content: formatChecklist(data),
+      },
+      {
+        key: 'competency',
+        label: '역량',
+        title: '역량 분석',
+        content: formatList(data.competency_analysis),
+      },
+      {
+        key: 'fit',
+        label: '적합성',
+        title: '직무/조직 적합성',
+        content: formatList(data.fit_analysis),
+      },
+      {
+        key: 'risk',
+        label: '검토',
+        title: '강점·우려·확인 포인트',
+        content: `강점\n${formatList(data.strength)}\n\n우려\n${formatList(data.concern)}\n\n확인 포인트\n${formatList(
+          data.check_point,
+        )}`,
+      },
+      {
+        key: 'comment',
+        label: '코멘트',
+        title: '최종 코멘트',
+        content: data.final_comment,
+      },
+    ],
+    exampleQuestions: questions.map((question) => question.question),
+    chatMessages: [
+      {
+        role: 'assistant',
+        text: '지원서, JD, 분석 리포트, 면접 질문 데이터를 기준으로 답변할 수 있습니다.',
+      },
+      {
+        role: 'user',
+        text: '이 지원자의 추가 검증 포인트를 알려줘.',
+      },
+      {
+        role: 'assistant',
+        text: data.check_point.join(' '),
+      },
+    ],
+  };
+}
+
+export function mapTemplateQuestions(data: ApiData<typeof coverLetterTemplateApiResponse>): TemplateQuestion[] {
+  return data.map((question) => ({
+    title: question.question,
+    guide: question.purpose,
+  }));
+}
+
+export function mapUserProfile(data: ApiData<typeof userProfileApiResponse>, company?: CompanyInfo): UserProfile {
+  return {
+    displayName: data.name,
+    username: data.username,
+    roleName: data.subscribe ? '구독 활성' : '구독 만료',
+    companyName: company?.company_name ?? '회사 정보 없음',
+    credit: data.credit,
+    subscribe: data.subscribe,
+    subscribeExpirationText: formatDateTime(data.subscribe_expiration),
+    verificationQuestion: data.verification_question,
+  };
 }
