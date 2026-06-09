@@ -71,7 +71,7 @@ export default function App() {
         colorSuccess: palette.accent,
         colorBgBase: mode === 'dark' ? palette.text : palette.background,
         colorTextBase: mode === 'dark' ? palette.card : palette.text,
-        fontFamily: 'Pretendard, Noto Sans KR, system-ui, sans-serif',
+        fontFamily: '"Noto Sans KR Clean", "Noto Sans KR", system-ui, sans-serif',
         borderRadius: 12,
       },
       components: {
@@ -345,6 +345,7 @@ export default function App() {
           ) : (
             <AppShell
               route={route}
+              mode={mode}
               assistantFab={
                 route === '/chat' ? undefined : (
                   <DocumentChatFab

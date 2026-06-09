@@ -1,22 +1,20 @@
 import { useState, type ReactNode } from 'react';
-import { Avatar, Drawer, Layout, Popover, Progress } from 'antd';
+import { Avatar, Drawer, Popover, Progress } from 'antd';
 import {
   CreditCardOutlined,
   LogoutOutlined,
   MenuOutlined,
   RightOutlined,
   SettingOutlined,
-  UpOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import type { UserProfile } from '../../api/adapters';
 import { mainMenu, type AppRoute } from '../../data/mockData';
-import type { Navigate, ShowAlert } from '../../types/app';
-
-const { Sider } = Layout;
+import type { Navigate, ShowAlert, ThemeMode } from '../../types/app';
 
 type NavigationProps = {
   route: AppRoute;
+  mode: ThemeMode;
   creditPercent: number;
   profile?: UserProfile;
   themeSwitch: ReactNode;
@@ -41,7 +39,7 @@ function AccountMenu({
   navigate,
   showAlert,
   onClose,
-}: Omit<NavigationProps, 'route'> & { onClose: () => void }) {
+}: Omit<NavigationProps, 'route' | 'mode'> & { onClose: () => void }) {
   const displayName = profile?.displayName ?? '채용 담당자';
   const email = profile?.email ?? 'recruiter@humour.ai';
 
@@ -109,50 +107,76 @@ function MenuItems({
   route,
   navigate,
   onNavigate,
-}: Pick<NavigationProps, 'route' | 'navigate'> & { onNavigate?: () => void }) {
+  variant = 'full',
+}: Pick<NavigationProps, 'route' | 'navigate'> & { onNavigate?: () => void; variant?: 'full' | 'icon' }) {
   return (
     <>
-      {sidebarMenu.map((item) => (
-        <button
-          key={item.route}
-          className={`side-nav-item ${route === item.route ? 'active' : ''}`}
-          onClick={() => {
-            onNavigate?.();
-            navigate(item.route);
-          }}
-        >
-          <span className="side-icon" aria-hidden="true">
-            {item.icon}
-          </span>
-          <span>
-            <strong>{item.label}</strong>
-            <small>{item.description}</small>
-          </span>
-        </button>
-      ))}
+      {sidebarMenu.map((item) => {
+        const isActive = route === item.route;
+        if (variant === 'icon') {
+          return (
+            <button
+              key={item.route}
+              type="button"
+              className={`side-nav-item icon-only ${isActive ? 'active' : ''}`}
+              aria-label={`${item.label}: ${item.description}`}
+              aria-current={isActive ? 'page' : undefined}
+              onClick={() => {
+                onNavigate?.();
+                navigate(item.route);
+              }}
+            >
+              <span className="side-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+              <span className="nav-slide-label" aria-hidden="true">
+                <strong>{item.label}</strong>
+                <small>{item.description}</small>
+              </span>
+            </button>
+          );
+        }
+
+        return (
+          <button
+            key={item.route}
+            type="button"
+            className={`side-nav-item ${isActive ? 'active' : ''}`}
+            aria-label={`${item.label}: ${item.description}`}
+            aria-current={isActive ? 'page' : undefined}
+            onClick={() => {
+              onNavigate?.();
+              navigate(item.route);
+            }}
+          >
+            <span className="side-icon" aria-hidden="true">
+              {item.icon}
+            </span>
+            <span>
+              <strong>{item.label}</strong>
+              <small>{item.description}</small>
+            </span>
+          </button>
+        );
+      })}
     </>
   );
 }
 
 export function MobileShellHeader(props: NavigationProps) {
-  const { route, creditPercent, profile, themeSwitch, navigate, showAlert } = props;
+  const { route, mode, creditPercent, profile, themeSwitch, navigate, showAlert } = props;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const activeLabel = mainMenu.find((item) => item.route === route)?.label ?? '대시보드';
   const displayName = profile?.displayName ?? '채용 담당자';
 
   return (
     <>
       <header className="mobile-shell-header">
-        <button className="mobile-nav-trigger" onClick={() => setDrawerOpen(true)} aria-label="메뉴 열기">
+        <button type="button" className="mobile-nav-trigger" onClick={() => setDrawerOpen(true)} aria-label="메뉴 열기">
           <MenuOutlined />
         </button>
-        <button className="mobile-brand-summary" onClick={() => navigate('/dashboard')} aria-label="대시보드로 이동">
-          <img src="/assets/humour-app-icon.png" alt="" />
-          <span>
-            <strong>{activeLabel}</strong>
-            <small>HumouR</small>
-          </span>
+        <button type="button" className="mobile-brand-logo" onClick={() => navigate('/dashboard')} aria-label="대시보드로 이동">
+          <img src={mode === 'dark' ? '/assets/humour-logo-dark.png' : '/assets/humour-logo-light.png'} alt="HumouR" />
         </button>
         <Popover
           rootClassName="account-popover mobile-account-popover"
@@ -173,10 +197,14 @@ export function MobileShellHeader(props: NavigationProps) {
           }
           getPopupContainer={(triggerNode) => (triggerNode.closest('.app-root') as HTMLElement) ?? document.body}
         >
-          <button className={`mobile-account-trigger ${route === '/mypage' ? 'active' : ''}`} aria-label="마이페이지 메뉴 열기">
-            <Avatar size={36} src={profile?.avatarUrl}>
-              {getInitials(displayName)}
-            </Avatar>
+          <button
+            type="button"
+            className={`mobile-account-trigger ${route === '/mypage' ? 'active' : ''}`}
+            aria-label="마이페이지 메뉴 열기"
+          >
+            <span className="mobile-profile-avatar" aria-hidden="true">
+              {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="" /> : getInitials(displayName)}
+            </span>
           </button>
         </Popover>
       </header>
@@ -187,6 +215,7 @@ export function MobileShellHeader(props: NavigationProps) {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         title={null}
+        getContainer={() => (document.querySelector('.app-root') as HTMLElement) ?? document.body}
       >
         <button
           className="brand-button mobile-drawer-brand"
@@ -196,7 +225,7 @@ export function MobileShellHeader(props: NavigationProps) {
           }}
           aria-label="대시보드로 이동"
         >
-          <img src="/assets/humour-logo-dark.png" alt="HumouR" />
+          <img src={mode === 'dark' ? '/assets/humour-logo-dark.png' : '/assets/humour-logo-light.png'} alt="HumouR" />
         </button>
         <div className="side-section mobile-drawer-menu">
           <span className="side-label">Main menu</span>
@@ -208,52 +237,52 @@ export function MobileShellHeader(props: NavigationProps) {
 }
 
 export function SidebarNav(props: NavigationProps) {
-  const { route, creditPercent, profile, themeSwitch, navigate, showAlert } = props;
+  const { route, mode, creditPercent, profile, themeSwitch, navigate, showAlert } = props;
   const [accountOpen, setAccountOpen] = useState(false);
   const displayName = profile?.displayName ?? '채용 담당자';
-  const email = profile?.email ?? 'recruiter@humour.ai';
 
   return (
-    <Sider className="sidebar" width={292} breakpoint="lg" collapsedWidth={0}>
-      <button className="brand-button" onClick={() => navigate('/dashboard')} aria-label="대시보드로 이동">
-        <img src="/assets/humour-logo-dark.png" alt="HumouR" />
-      </button>
-      <div className="side-section">
-        <span className="side-label">Main menu</span>
-        <MenuItems route={route} navigate={navigate} />
+    <nav className="sidebar desktop-shell-nav" aria-label="주요 페이지">
+      <div className="desktop-shell-nav-inner">
+        <button type="button" className="brand-button" onClick={() => navigate('/dashboard')} aria-label="대시보드로 이동">
+          <img src={mode === 'dark' ? '/assets/humour-logo-dark.png' : '/assets/humour-logo-light.png'} alt="HumouR" />
+        </button>
+        <div className="side-section">
+          <span className="side-label">Main menu</span>
+          <MenuItems route={route} navigate={navigate} variant="icon" />
+        </div>
+        <div className="sidebar-account-wrap">
+          <Popover
+            rootClassName="account-popover"
+            placement="bottomRight"
+            trigger="click"
+            arrow={false}
+            open={accountOpen}
+            onOpenChange={setAccountOpen}
+            content={
+              <AccountMenu
+                creditPercent={creditPercent}
+                profile={profile}
+                themeSwitch={themeSwitch}
+                navigate={navigate}
+                showAlert={showAlert}
+                onClose={() => setAccountOpen(false)}
+              />
+            }
+            getPopupContainer={(triggerNode) => (triggerNode.closest('.app-root') as HTMLElement) ?? document.body}
+          >
+            <button
+              type="button"
+              className={`sidebar-account-button ${route === '/mypage' ? 'active' : ''}`}
+              aria-label="계정 메뉴 열기"
+            >
+              <Avatar size={38} src={profile?.avatarUrl}>
+                {getInitials(displayName)}
+              </Avatar>
+            </button>
+          </Popover>
+        </div>
       </div>
-      <div className="sidebar-account-wrap">
-        <Popover
-          rootClassName="account-popover"
-          placement="topLeft"
-          trigger="click"
-          arrow={false}
-          open={accountOpen}
-          onOpenChange={setAccountOpen}
-          content={
-            <AccountMenu
-              creditPercent={creditPercent}
-              profile={profile}
-              themeSwitch={themeSwitch}
-              navigate={navigate}
-              showAlert={showAlert}
-              onClose={() => setAccountOpen(false)}
-            />
-          }
-          getPopupContainer={(triggerNode) => (triggerNode.closest('.app-root') as HTMLElement) ?? document.body}
-        >
-          <button className={`sidebar-account-button ${route === '/mypage' ? 'active' : ''}`}>
-            <Avatar size={38} src={profile?.avatarUrl}>
-              {getInitials(displayName)}
-            </Avatar>
-            <span>
-              <strong>{displayName}</strong>
-              <small>{email}</small>
-            </span>
-            <UpOutlined />
-          </button>
-        </Popover>
-      </div>
-    </Sider>
+    </nav>
   );
 }

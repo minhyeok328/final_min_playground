@@ -3,7 +3,7 @@ import { Layout } from 'antd';
 import { MobileShellHeader, SidebarNav } from './SidebarNav';
 import type { UserProfile } from '../../api/adapters';
 import type { AppRoute } from '../../data/mockData';
-import type { Navigate, ShowAlert } from '../../types/app';
+import type { Navigate, ShowAlert, ThemeMode } from '../../types/app';
 
 const { Content } = Layout;
 
@@ -11,6 +11,7 @@ type AppShellProps = {
   route: AppRoute;
   children: ReactNode;
   assistantFab?: ReactNode;
+  mode: ThemeMode;
   themeSwitch: ReactNode;
   creditPercent: number;
   profile?: UserProfile;
@@ -22,6 +23,7 @@ export function AppShell({
   route,
   children,
   assistantFab,
+  mode,
   themeSwitch,
   creditPercent,
   profile,
@@ -32,6 +34,7 @@ export function AppShell({
     <Layout className="shell">
       <SidebarNav
         route={route}
+        mode={mode}
         creditPercent={creditPercent}
         profile={profile}
         themeSwitch={themeSwitch}
@@ -41,6 +44,7 @@ export function AppShell({
       <Layout>
         <MobileShellHeader
           route={route}
+          mode={mode}
           creditPercent={creditPercent}
           profile={profile}
           themeSwitch={themeSwitch}
