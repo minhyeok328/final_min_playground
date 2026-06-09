@@ -8,8 +8,8 @@ import { InlineLoading } from '../components/common/InlineLoading';
 import { PageTitle } from '../components/common/PageTitle';
 import { SectionCard } from '../components/common/SectionCard';
 import type { JdItem, RecruitmentPreview } from '../api/adapters';
-import { mockClient } from '../api/mockClient';
-import type { KeySetter, RunMockAction } from '../types/app';
+import { apiClient } from '../api/backendClient';
+import type { KeySetter, RunApiAction } from '../types/app';
 
 type RecruitmentPostPageProps = {
   jdList: JdItem[];
@@ -19,7 +19,7 @@ type RecruitmentPostPageProps = {
   loadingKey: string | null;
   setSelectedRows: KeySetter;
   setPostGenerated: (value: boolean) => void;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
 };
 
 export function RecruitmentPostPage({
@@ -30,7 +30,7 @@ export function RecruitmentPostPage({
   loadingKey,
   setSelectedRows,
   setPostGenerated,
-  runMockAction,
+  runApiAction,
 }: RecruitmentPostPageProps) {
   return (
     <>
@@ -45,16 +45,16 @@ export function RecruitmentPostPage({
               type="primary"
               disabled={!selectedRows.length || loadingKey === 'post-generate'}
               onClick={() =>
-                void runMockAction(
+                void runApiAction(
                   'post-generate',
-                  () => mockClient.generateRecruitmentPost(selectedRows.map(String)),
+                  () => apiClient.generateRecruitmentPost(selectedRows.map(String)),
                   () => setPostGenerated(true),
                 )
               }
             >
               {loadingKey === 'post-generate' ? <InlineLoading label="생성 중" /> : '공고 생성'}
             </Button>
-            <Button icon={<DownloadOutlined />} onClick={() => void runMockAction('post-pdf', mockClient.downloadRecruitmentPdf)}>
+            <Button icon={<DownloadOutlined />} onClick={() => void runApiAction('post-pdf', apiClient.downloadRecruitmentPdf)}>
               PDF
             </Button>
           </Space>

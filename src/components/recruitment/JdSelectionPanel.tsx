@@ -30,14 +30,14 @@ export function JdSelectionPanel({ jdList, selectedRows, setSelectedRows }: JdSe
             onChange: (keys) => setSelectedRows(keys),
           }}
           columns={[
-            { title: '직무', dataIndex: 'title' },
-            { title: '팀', dataIndex: 'team' },
+            { title: 'JD', dataIndex: 'title' },
+            { title: '요건', dataIndex: 'team' },
             {
               title: '상태',
               dataIndex: 'status',
               render: (_value: string, record) => statusTag(record.status, record.statusCode),
             },
-            { title: '적합도', dataIndex: 'fit', render: (value: number) => `${value}%` },
+            { title: '평균 점수', dataIndex: 'fit', render: (value: number) => `${value}점` },
           ]}
         />
       </div>
@@ -58,7 +58,7 @@ export function JdSelectionPanel({ jdList, selectedRows, setSelectedRows }: JdSe
               <span>{item.team}</span>
               <div>
                 {statusTag(item.status, item.statusCode)}
-                <Tag color="blue">Fit {item.fit}%</Tag>
+                <Tag color="blue">평균 {item.fit}점</Tag>
               </div>
             </button>
           );
