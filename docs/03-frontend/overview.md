@@ -8,7 +8,6 @@
 | [`src/components/layout/SidebarNav.tsx`](../../src/components/layout/SidebarNav.tsx) | `mainMenu` 기반 네비게이션, 하단 크레딧 |
 | [`src/components/layout/TopHeader.tsx`](../../src/components/layout/TopHeader.tsx) | 스티키 헤더, 데스크톱 검색, 모바일 라우트 셀렉트 |
 | [`src/components/layout/CreditSummary.tsx`](../../src/components/layout/CreditSummary.tsx) | 분석 크레딧 % 표시 |
-| [`src/components/layout/NotificationButton.tsx`](../../src/components/layout/NotificationButton.tsx) | 알림 드롭다운 |
 | [`src/components/layout/AuthScreen.tsx`](../../src/components/layout/AuthScreen.tsx) | 로그인·가입·비밀번호 레이아웃 |
 
 `AppShell`은 `content-frame`에 `key={route}`를 두어 라우트 전환 시 페이지 진입 애니메이션을 유도합니다.
@@ -49,7 +48,7 @@
 |------|------|
 | `EChart.tsx` | ECharts React 래퍼 |
 | `DonutChart.tsx` | 대시보드 적합도 도넛 |
-| `chartAdapters.ts` | API/목 데이터 → 시리즈 변환 |
+| `chartAdapters.ts` | API 데이터 → 시리즈 변환 |
 | `chartTheme.ts` | 라이트/다크 색상 |
 
 [`AnalysisSummaryPanel.tsx`](../../src/components/dashboard/AnalysisSummaryPanel.tsx)에서 `mode`에 따라 테마를 넘깁니다.

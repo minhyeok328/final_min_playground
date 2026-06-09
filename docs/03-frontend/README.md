@@ -1,6 +1,6 @@
 # 프론트엔드 (03)
 
-HumouR UI 고도화 목업의 라우팅·레이아웃·컴포넌트 계층입니다. (실제 HTTP 없음 — `mockClient` 목)
+HumouR UI 고도화 목업의 라우팅·레이아웃·컴포넌트 계층입니다. API 호출은 [`src/api/backendClient.ts`](../../src/api/backendClient.ts)가 backend 명세에 맞춰 처리합니다.
 
 | 문서 | 내용 |
 |------|------|

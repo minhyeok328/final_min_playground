@@ -1,102 +1,77 @@
-# 자기소개서 (`#/cover-letter`)
+# 지원서 (`#/cover-letter`)
 
 ## 화면 역할
 
-JD별 **단건 입력** UI와 **Excel 업로드** 미리보기, **분석 요청** 플로우입니다.
+JD별 지원자 정보와 자기소개 문항/답변을 확인하고, 선택 JD의 지원서 분석을 요청합니다.
 
 ## 관련 파일
 
 | 파일 | 기능 |
 |------|------|
 | [`src/pages/CoverLetterPage.tsx`](../../src/pages/CoverLetterPage.tsx) | 분석 요청 버튼, JD 선택 상태 |
-| [`src/components/cover-letter/CoverLetterInputPanel.tsx`](../../src/components/cover-letter/CoverLetterInputPanel.tsx) | JD Select, 지원자명, 본문 |
-| [`src/components/cover-letter/CoverLetterUploadPanel.tsx`](../../src/components/cover-letter/CoverLetterUploadPanel.tsx) | Dragger 업로드, 테이블, 채팅 이동 |
-| [`src/App.tsx`](../../src/App.tsx) | `coverUploaded`, `analysisDone` 플래그 |
-| [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts) | `coverLetterDraftApiResponse`, `coverLettersApiResponse` |
+| [`src/components/cover-letter/CoverLetterInputPanel.tsx`](../../src/components/cover-letter/CoverLetterInputPanel.tsx) | JD Select, 지원자명, 자기소개 |
+| [`src/components/cover-letter/CoverLetterUploadPanel.tsx`](../../src/components/cover-letter/CoverLetterUploadPanel.tsx) | 지원서 목록 미리보기 |
+| [`src/api/backendClient.ts`](../../src/api/backendClient.ts) | `resume/get`, `resume/analize` 호출 |
 
-## Django API
+## 현재 backend 호출
 
-### `GET /api/v1/cover-letters/draft/`
-
-단건 입력 폼 초기값.
-
-**응답 `data`**:
+### JD별 지원서 조회 — `POST /api/resume/get/`
 
 ```json
 {
-  "applicant_name": "김서연",
-  "body": "프로덕트의 복잡한 입력 흐름을...",
-  "sample_file_name": "cover_letters_sample.xlsx",
-  "upload_hint": "파일 선택 시..."
+  "job_description_id": 1
 }
 ```
 
-### `GET /api/v1/cover-letters/`
-
-업로드 후 미리보기 행 (업로드 전에도 빈 `rows` 또는 404 정책은 백엔드 결정).
-
-**응답 `data`**:
+또는 단건 조회:
 
 ```json
 {
-  "rows": [
+  "id": 1
+}
+```
+
+성공 응답:
+
+```json
+{
+  "error": false,
+  "data": [
     {
-      "id": "cover-001",
-      "applicant_name": "김서연",
-      "job_title": "Frontend Engineer",
-      "status_code": "valid",
-      "status_label": "정상",
-      "analysis_score": 92
+      "id": 1,
+      "job_description_id": 1,
+      "name": "홍길동",
+      "skill": ["HTML", "CSS", "JS"],
+      "self_intoduction": [
+        {
+          "question": "지원 동기",
+          "answer": "답변"
+        }
+      ],
+      "status": "done",
+      "reviewed": false
     }
   ]
 }
 ```
 
-`status_code` 예: `valid`, `missing_answer`
+`self_intoduction`은 현재 DB/명세 오탈자 그대로 사용합니다.
 
-### `POST /api/v1/cover-letters/upload/`
-
-**요청**: `multipart/form-data`, 필드명 예 `file` (**.xlsx**)
-
-목업은 실제 파일을 보내지 않습니다.
-
-**응답 `data`**:
-
-```json
-{ "uploaded_count": 3 }
-```
-
-성공 후 프론트: `coverUploaded = true`, 테이블에 `GET` 결과 `rows` 표시.
-
-### `POST /api/v1/cover-letters/analyze/`
-
-**요청** (권장):
+### 분석 요청 — `POST /api/resume/analize/`
 
 ```json
 {
-  "jd_id": "jd-fe"
+  "id": 1
 }
 ```
 
-단건 저장이 선행된다면 추가 필드 (**needs verification**):
+명세상 아직 미구현으로 표시되어 있어, backend 구현 전에는 실패할 수 있습니다.
 
-```json
-{
-  "jd_id": "jd-fe",
-  "applicant_name": "김서연",
-  "body": "..."
-}
-```
+## 추가 명세 필요
 
-**응답 `data`**:
+- 전체 지원서 목록 조회 API
+- 파일 업로드 API
+- `resume/add` 입력의 `job_description_id`
+- `resume/analize` 성공 응답 형식
 
-```json
-{ "jd_id": "jd-fe" }
-```
-
-성공 후: `analysisDone = true` → 「AI 문서 검색 화면에서 리포트 확인」→ `#/chat`.
-
-## 목업 한계
-
-- `CoverLetterInputPanel`은 `defaultValue`만 사용, 저장 API 없음
-- 업로드는 어떤 파일이든 동일 샘플 `rows` 반환
+상세 제안: [api-spec-addendum.md](../06-api/api-spec-addendum.md).

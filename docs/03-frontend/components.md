@@ -8,9 +8,8 @@
 |------|------|
 | `AppShell.tsx` | 사이드바·헤더·콘텐츠·`assistantFab` 조합 |
 | `SidebarNav.tsx` | 메인 메뉴, 브랜드 로고, 크레딧 |
-| `TopHeader.tsx` | 현재 화면 제목, 검색, 알림, 테마, 로그아웃 |
+| `TopHeader.tsx` | 현재 화면 제목, 검색, 테마, 로그아웃 |
 | `CreditSummary.tsx` | 사이드바 하단 크레딧 진행률 |
-| `NotificationButton.tsx` | 알림 목록 드롭다운 |
 | `AuthScreen.tsx` | 인증 화면 공통 레이아웃 |
 
 ## dashboard/
@@ -27,7 +26,7 @@
 
 | 파일 | 기능 |
 |------|------|
-| `CompanyProfileForm.tsx` | 회사명·산업·규모·소개·핵심 가치 폼 |
+| `CompanyProfileForm.tsx` | 회사명·직원 수·팀 구성·소개·인재상 폼 |
 | `CompanyCompletionPanel.tsx` | 프로필 완성도 % |
 
 ## jd/
@@ -57,9 +56,9 @@
 
 | 파일 | 기능 |
 |------|------|
-| `ProfileSummaryCard.tsx` | 아바타·이메일·크레딧 |
-| `AccountSettingsForm.tsx` | 담당자명·알림 채널 |
-| `SecuritySettingsForm.tsx` | 비밀번호 변경 UI(목) |
+| `ProfileSummaryCard.tsx` | 담당자·구독·크레딧 |
+| `AccountSettingsForm.tsx` | 담당자명·본인확인 질문 |
+| `SecuritySettingsForm.tsx` | 비밀번호 변경 UI |
 | `CompanySummaryPanel.tsx` | 회사 요약 + 회사 페이지 이동 |
 
 ## recruitment/

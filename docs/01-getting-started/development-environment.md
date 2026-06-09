@@ -48,11 +48,11 @@ node scripts/verify-document-chat-widget.mjs
 |------|------|
 | [`index.html`](../../index.html) | `#root`, 파비콘 `/assets/humour-app-icon.png` |
 | [`src/main.tsx`](../../src/main.tsx) | React 마운트, `antd/dist/reset.css`, `styles.css` |
-| [`src/App.tsx`](../../src/App.tsx) | 라우팅, 라이트/다크 테마, `useMockAppData`, `DocumentChatFab`, `mockClient` 액션 |
+| [`src/App.tsx`](../../src/App.tsx) | 라우팅, 라이트/다크 테마, `useMockAppData`, `DocumentChatFab`, API 액션 |
 
-## 목업 데이터 확인
+## API 데이터 확인
 
-앱 기동 시 [`useMockAppData`](../../src/hooks/useMockAppData.ts)가 `mockClient` GET 12건을 병렬 호출합니다. 로딩 중에는 `PageLoading`, 실패 시 `PageError`가 표시됩니다.
+앱 기동 시 [`useMockAppData`](../../src/hooks/useMockAppData.ts)가 [`backendClient.ts`](../../src/api/backendClient.ts)의 `getDashboard`, `getAuthDefaults`를 호출합니다. `getDashboard`는 backend 명세에 맞춰 `account/get`, `compinfo/get`, `jd/get`, `resume/get`, `report/get`, `question/get`을 조합합니다. 로딩 중에는 `PageLoading`, 실패 시 `PageError`가 표시됩니다.
 
 정적 이미지는 [`public/assets/`](../../public/assets/)에 두면 빌드 없이 `/assets/...`로 참조됩니다.
 

@@ -8,7 +8,7 @@ SKN26 파이널 **HumouR** 채용 보조 서비스의 **UI 고도화·레이아�
 - ECharts로 대시보드 적합도 도넛 차트를 표시합니다.
 - `styles.css` CSS 변수와 Ant Design `ConfigProvider`로 **운영형 SaaS** 느낌의 비주얼·모션을 적용합니다.
 - 해시 라우팅(`#/dashboard`, `#/jd` …)으로 전체 화면 흐름을 탐색합니다.
-- Django JSON API **계약**을 목 데이터로 고정해, 메인 백엔드 연동 시 필드명·래퍼를 맞출 수 있게 합니다.
+- backend JSON API **계약**을 실제 endpoint 호출 기준으로 맞추고, 명세가 부족한 영역만 로컬 샘플 데이터로 보완합니다.
 
 **이 레포는 UI 고도화·디자인 실험용**이며, HumouR 메인 백엔드/배포 저장소와 분리되어 있습니다.
 
@@ -28,12 +28,12 @@ SKN26 파이널 **HumouR** 채용 보조 서비스의 **UI 고도화·레이아�
 
 | 항목 | 상태 |
 |------|------|
-| HTTP / Django | **없음** — `mockClient`가 `apiMockData.ts`를 ~260ms 지연 후 반환 |
-| 인증·세션 | **없음** — 로그인·가입은 UI + 성공 Alert만 |
-| 폼 mutation | 입력값 **미전송** — `mockClient.*`가 고정 성공 메시지 반환 |
-| 어댑터 | `adapters.ts`가 snake_case → camelCase (Django 연동 시 재사용 가능) |
+| HTTP / Django | `backendClient.ts`가 `/api/{endpoint}/` 형식의 backend 명세 endpoint 호출 |
+| 인증·세션 | 쿠키 기반 세션 + `GET /api/csrf/`로 CSRF 토큰 발급 |
+| 폼 mutation | `login`, `signin`, `account/modify`, `compinfo/modify`, `resume/analize` 등 명세 endpoint 호출 |
+| 어댑터 | `adapters.ts`가 실제 snake_case 응답을 UI camelCase 모델로 변환 |
 
-연동 시: `mockClient`를 HTTP 클라이언트로 교체하고, 응답 `data`의 snake_case 키를 유지하면 됩니다. 문서의 **요청 JSON**은 Django 구현 시 프론트가 보낼 **권장 계약**입니다.
+아직 명세가 없는 채팅, 문서 다운로드, username 중복 확인 등은 로컬 성공 응답 또는 안내 메시지로 남겨 두고, 필요한 추가 API는 [api-spec-addendum.md](../06-api/api-spec-addendum.md)에 정리했습니다.
 
 ## 기술 스택
 

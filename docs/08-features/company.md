@@ -2,78 +2,59 @@
 
 ## 화면 역할
 
-회사 프로필·핵심 가치·복지·입력 완성도를 편집·저장합니다.
+회사 프로필·팀 구성·채용 인재상·입력 완성도를 편집·저장합니다.
 
 ## 관련 파일
 
 | 파일 | 기능 |
 |------|------|
 | [`src/pages/CompanyPage.tsx`](../../src/pages/CompanyPage.tsx) | 저장·초기화 액션, 2열 레이아웃 |
-| [`src/components/company/CompanyProfileForm.tsx`](../../src/components/company/CompanyProfileForm.tsx) | Ant Form (`name`, `industry`, `size`, `location`, `introduction`) |
-| [`src/components/company/CompanyCompletionPanel.tsx`](../../src/components/company/CompanyCompletionPanel.tsx) | `profile_completion` 표시 |
-| [`src/api/mockClient.ts`](../../src/api/mockClient.ts) | `getCompanyProfile`, `getCompanyChoices`, `saveCompanyProfile` |
+| [`src/components/company/CompanyProfileForm.tsx`](../../src/components/company/CompanyProfileForm.tsx) | 회사명, 직원 수, 팀 구성, 소개, 인재상 표시 |
+| [`src/components/company/CompanyCompletionPanel.tsx`](../../src/components/company/CompanyCompletionPanel.tsx) | 입력 완성도 표시 |
+| [`src/api/backendClient.ts`](../../src/api/backendClient.ts) | `compinfo/get`, `compinfo/modify` 호출 |
 
-## Django API
+## 현재 backend 호출
 
-### `GET /api/v1/companies/me/`
+### 조회 — `POST /api/compinfo/get/`
 
-**응답 `data`**:
+요청 body는 없습니다.
+
+```json
+{}
+```
+
+성공 응답:
 
 ```json
 {
-  "id": "company-001",
-  "name": "HumouR Labs",
-  "industry": "AI 기반 HR 채용 보조 시스템",
-  "employee_size": "51-200명",
-  "location": "Seoul, KR",
-  "introduction": "...",
-  "core_values": ["데이터 기반 의사결정", "..."],
-  "benefits": ["자율 출퇴근", "..."],
-  "profile_completion": 82
+  "error": false,
+  "data": {
+    "company_name": "테크브릿지",
+    "employee_count": 100,
+    "team_composition": ["개발팀", "기획/PM팀"],
+    "company_description": "회사 소개",
+    "employ_style": ["협업이 가능한 인재"]
+  }
 }
 ```
 
-프론트 Form 필드 `size` ↔ API `employee_size` ([`mapCompany`](../../src/api/adapters.ts)).
+`id`, `account_id`가 없으면 프론트는 로컬 기본값으로 보완합니다.
 
-### `GET /api/v1/companies/choices/`
-
-**응답 `data`**:
+### 수정 — `POST /api/compinfo/modify/`
 
 ```json
 {
-  "employee_size_options": ["1-50명", "51-200명", "201-500명", "500명 이상"],
-  "notification_channels": [
-    { "value": "email", "label": "이메일" },
-    { "value": "none", "label": "끄기" }
-  ]
+  "company_name": "테크브릿지",
+  "employee_count": 100,
+  "team_composition": ["개발팀", "기획/PM팀"],
+  "company_description": "회사 소개",
+  "employ_style": ["협업이 가능한 인재"]
 }
 ```
 
-### `PATCH /api/v1/companies/me/` (저장 — 권장 요청)
+명세상 출력은 없으므로 프론트는 빈 `200 OK` 또는 `204 No Content`도 성공으로 처리합니다.
 
-목업은 body 없이 성공만 반환합니다. Django 연동 시 Form 값 기준 권장 body:
+## 추가 명세 필요
 
-```json
-{
-  "name": "HumouR Labs",
-  "industry": "AI 기반 HR 채용 보조 시스템",
-  "employee_size": "51-200명",
-  "location": "Seoul, KR",
-  "introduction": "...",
-  "core_values": ["..."],
-  "benefits": ["..."]
-}
-```
-
-**응답 `data`** (목업):
-
-```json
-{ "updated_at": "2026-06-03T14:00:00+09:00" }
-```
-
-**응답 `message`**: 예) `회사 정보가 저장되었습니다.`
-
-## 목업 한계
-
-- 「초기화」는 API 없이 Alert만 표시
-- 핵심 가치 「태그 추가」는 Alert만 (`CompanyProfileForm`)
+- 현재 저장 버튼은 Form 상태를 아직 body로 묶지 않고 빈 수정 요청을 보냅니다.
+- 수정 성공 응답 body 형식은 [api-spec-addendum.md](../06-api/api-spec-addendum.md)에 제안했습니다.

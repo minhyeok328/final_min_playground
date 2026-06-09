@@ -1,71 +1,64 @@
-# 자기소개서 템플릿 (`#/cover-letter-template`)
+# 면접 질문/자소서 포맷 (`#/cover-letter-template`)
 
 ## 화면 역할
 
-**전역 선택 JD**를 요약으로 보여 주고, JD 기반 **자소서 문항·가이드 생성**·문서 다운로드(목)를 제공합니다.
+선택 JD를 요약으로 보여 주고, 지원서 분석 결과에서 생성된 면접 질문/목적을 문서화하는 화면입니다.
 
 ## 관련 파일
 
 | 파일 | 기능 |
 |------|------|
-| [`src/pages/CoverLetterTemplatePage.tsx`](../../src/pages/CoverLetterTemplatePage.tsx) | JD 요약·문항 List·생성/다운로드 |
+| [`src/pages/CoverLetterTemplatePage.tsx`](../../src/pages/CoverLetterTemplatePage.tsx) | JD 요약·질문 List·생성/다운로드 |
 | [`src/App.tsx`](../../src/App.tsx) | `selectedJd`, `templateGenerated` |
-| [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts) | `coverLetterTemplateApiResponse` |
-| [`src/api/adapters.ts`](../../src/api/adapters.ts) | `mapTemplateQuestions` (`id`는 UI List에서 미사용) |
+| [`src/api/backendClient.ts`](../../src/api/backendClient.ts) | `question/get` 조회, 생성/다운로드는 로컬 성공 응답 |
+| [`src/api/adapters.ts`](../../src/api/adapters.ts) | `InterviewQuestion` → 화면 질문 변환 |
 
-JD 선택은 `JdPage` / `CoverLetterPage`와 동일한 `selectedJdIdOverride`를 공유합니다.
+## 현재 backend 호출
 
-## Django API
+질문 목록은 지원서별로 조회합니다.
 
-### `GET /api/v1/cover-letter-templates/`
-
-생성된 문항 목록 (또는 빈 `questions`).
-
-**응답 `data`**:
+```text
+POST /api/question/get/
+```
 
 ```json
 {
-  "questions": [
+  "resume_id": 1
+}
+```
+
+성공 응답:
+
+```json
+{
+  "error": false,
+  "data": [
     {
-      "id": "question-001",
-      "title": "문항 1. 문제 해결 경험",
-      "guide": "복잡한 UI 요구사항을..."
+      "id": 1,
+      "resume_id": 1,
+      "question": "기술 선택의 근거를 설명해 주세요.",
+      "answer": "기대 답변",
+      "purpose": "문제 해결 방식 확인"
     }
   ]
 }
 ```
 
-### `POST /api/v1/cover-letter-templates/generate/`
+## 추가 명세 필요
 
-**요청**:
+질문 문서 생성 및 다운로드 endpoint는 backend 명세에 없습니다. 현재 생성/다운로드 버튼은 로컬 성공 응답만 표시합니다.
+
+필요하면 다음 형식의 API가 필요합니다.
+
+```text
+POST /api/question-document/generate/
+```
 
 ```json
 {
-  "jd_id": "jd-fe"
+  "job_description_id": 1,
+  "resume_ids": [1, 2]
 }
 ```
 
-**응답 `data`** (목업):
-
-```json
-{ "jd_id": "jd-fe" }
-```
-
-실서비스: 응답에 `questions` 배열을 포함하거나 POST 후 GET 재호출.
-
-**응답 `message`**: 예) `자기소개서 문항을 생성했습니다.`
-
-프론트: `templateGenerated = true` → `templateQuestions` List 표시.
-
-### `GET /api/v1/cover-letter-templates/export/`
-
-목업 JSON:
-
-```json
-{ "file_name": "cover-letter-template.docx" }
-```
-
-## 목업 한계
-
-- 페이지 내 JD 변경 UI 없음 (`App`의 `selectedJd`만 사용)
-- 생성 후에도 질문 내용은 초기 `getCoverLetterTemplate` 결과 고정
+다운로드는 파일 URL 또는 바이너리 응답 형식으로 별도 명세가 필요합니다.
