@@ -197,7 +197,7 @@ button,
 
 .side-label {
   margin: 0 0 2px 8px;
-  color: rgba(255, 255, 255, 0.66);
+  color: var(--subtle);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0;
@@ -212,7 +212,7 @@ button,
   width: 100%;
   min-height: 54px;
   padding: 8px 10px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted);
   text-align: left;
   border: 1px solid transparent;
   border-radius: 18px;
@@ -399,7 +399,7 @@ button,
 }
 
 .account-menu-head .ant-avatar {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
   color: #ffffff;
   font-weight: 900;
 }
@@ -1028,13 +1028,18 @@ button,
 
 .ant-btn-default {
   color: var(--text);
-  background: color-mix(in srgb, var(--surface) 92%, var(--primary-soft)) !important;
+  background: var(--surface-raised) !important;
 }
 
 .ant-btn-primary:not(.ant-btn-background-ghost) {
   border-color: transparent;
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong)) !important;
+  background: var(--primary) !important;
   box-shadow: 0 10px 22px rgba(47, 115, 246, 0.24);
+}
+
+.ant-btn-primary:not(.ant-btn-background-ghost):hover,
+.ant-btn-primary:not(.ant-btn-background-ghost):focus-visible {
+  background: var(--primary-strong) !important;
 }
 
 .ant-btn-primary.ant-btn-background-ghost {
@@ -1097,19 +1102,17 @@ button,
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary), rgba(20, 184, 166, 0.72), transparent);
+  background: var(--primary);
   opacity: 0.78;
   content: "";
 }
 
 .section-card .ant-card-body {
-  background:
-    linear-gradient(180deg, rgba(47, 115, 246, 0.025), transparent 36%),
-    transparent;
+  background: transparent;
 }
 
 .section-card .ant-card-head {
-  background: color-mix(in srgb, var(--surface) 92%, var(--primary-soft));
+  background: var(--surface-soft);
 }
 
 .ant-card-extra .ant-btn-link {
@@ -1289,7 +1292,7 @@ button,
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.58);
+  background: color-mix(in srgb, var(--surface) 86%, var(--primary-soft));
 }
 
 .hero-stat svg {
@@ -1315,9 +1318,7 @@ button,
   overflow: hidden;
   min-height: 290px;
   border-radius: 24px;
-  background:
-    linear-gradient(145deg, rgba(47, 115, 246, 0.22), rgba(20, 184, 166, 0.08)),
-    #eaf2ff;
+  background: color-mix(in srgb, var(--primary-soft) 72%, var(--surface));
 }
 
 .analysis-board {
@@ -1392,9 +1393,9 @@ button,
   align-items: center;
   min-width: 178px;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-raised);
   box-shadow: 0 16px 34px rgba(31, 77, 161, 0.16);
 }
 
@@ -1402,7 +1403,7 @@ button,
   width: 28px;
   height: 28px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), #8db8ff);
+  background: var(--primary);
 }
 
 .talent-card strong {
@@ -1435,7 +1436,7 @@ button,
   padding: 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background: color-mix(in srgb, var(--surface) 84%, #eef2ff);
+  background: var(--surface-soft);
 }
 
 .summary-profile {
@@ -1452,7 +1453,7 @@ button,
   height: 58px;
   border-radius: 50%;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
   font-size: 24px;
   box-shadow: var(--shadow-sm);
 }
@@ -1502,7 +1503,7 @@ button,
   padding: 13px;
   border: 1px solid var(--border);
   border-radius: 15px;
-  background: var(--surface);
+  background: var(--surface-raised);
 }
 
 .echart-donut {
@@ -1516,7 +1517,7 @@ button,
   place-items: center;
   min-height: 238px;
   border-radius: 18px;
-  background: radial-gradient(circle at center, rgba(47, 115, 246, 0.1), transparent 60%);
+  background: var(--surface-soft);
 }
 
 .analysis-summary-card .ant-card-body {
@@ -1556,7 +1557,7 @@ button,
 
 .applicant-review-card .ant-progress-bg,
 .fit-progress .ant-progress-bg {
-  background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+  background: var(--primary) !important;
 }
 
 .task-item,
@@ -1825,9 +1826,7 @@ button,
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(47, 115, 246, 0.06), transparent),
-    color-mix(in srgb, var(--surface-soft) 72%, var(--surface));
+  background: color-mix(in srgb, var(--surface-soft) 72%, var(--surface));
 }
 
 .chat-bubble {
@@ -1842,7 +1841,7 @@ button,
 .chat-bubble.user {
   justify-self: end;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  background: var(--primary);
   border-color: transparent;
 }
 
@@ -1908,6 +1907,8 @@ button,
   height: 58px;
   padding: 0 20px 0 12px !important;
   border-radius: 999px !important;
+  background: var(--primary) !important;
+  border-color: transparent !important;
   box-shadow: 0 24px 56px rgba(47, 115, 246, 0.36) !important;
   cursor: pointer;
 }
@@ -1943,9 +1944,7 @@ button,
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 24px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, var(--primary-soft)), var(--surface-raised)),
-    var(--surface-raised);
+  background: var(--surface-raised);
   box-shadow: var(--shadow-lg);
   animation: widget-pop 220ms ease both;
 }
@@ -2007,7 +2006,7 @@ button,
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: var(--primary);
 }
 
 .document-chat-avatar {
@@ -2021,9 +2020,7 @@ button,
   min-height: 0;
   overflow: auto;
   padding: 14px 0 0;
-  background:
-    linear-gradient(180deg, rgba(47, 115, 246, 0.05), transparent 40%),
-    var(--surface-soft);
+  background: var(--surface-soft);
 }
 
 .document-chat-widget-intro {
@@ -2345,13 +2342,11 @@ button,
 .app-root[data-theme="dark"] .summary-metrics div,
 .app-root[data-theme="dark"] .talent-card,
 .app-root[data-theme="dark"] .analysis-board {
-  background: rgba(15, 23, 42, 0.66);
+  background: var(--surface-soft);
 }
 
 .app-root[data-theme="dark"] .hero-visual {
-  background:
-    linear-gradient(145deg, rgba(110, 163, 255, 0.18), rgba(67, 217, 198, 0.1)),
-    rgba(255, 255, 255, 0.04);
+  background: var(--surface-soft);
 }
 
 .app-root[data-theme="dark"] .person-body {
@@ -2359,11 +2354,11 @@ button,
 }
 
 .app-root[data-theme="dark"] .chat-window {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-soft);
 }
 
 .app-root[data-theme="dark"] .document-chat-widget {
-  background: var(--surface);
+  background: var(--surface-raised);
 }
 
 .app-root[data-theme="dark"] .document-chat-widget-header,
@@ -2880,7 +2875,8 @@ button,
 
   .hero-person {
     right: 18px;
-    transform: scale(0.9);
+    bottom: 12px;
+    transform: scale(0.78);
     transform-origin: bottom right;
   }
 
@@ -2973,11 +2969,17 @@ button,
 
   .document-chat-fab {
     right: 16px;
-    bottom: 16px;
-    min-width: 58px;
-    width: 58px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    min-width: 54px;
+    width: 54px;
+    height: 54px;
     padding: 0 !important;
     justify-content: center;
+  }
+
+  .document-chat-fab-icon {
+    width: 38px;
+    height: 38px;
   }
 
   .document-chat-fab-text {
@@ -2985,12 +2987,13 @@ button,
   }
 
   .document-chat-widget {
-    top: auto;
+    top: 76px;
     right: 12px;
-    bottom: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
     left: 12px;
     width: calc(100vw - 24px);
-    height: min(78vh, 680px);
+    height: auto;
+    max-height: calc(100vh - 96px - env(safe-area-inset-bottom));
     border-radius: 22px;
   }
 
@@ -3034,13 +3037,17 @@ button,
   }
 
   .document-chat-window {
-    max-height: 25vh;
+    max-height: 23vh;
     padding-inline: 12px;
   }
 
   .document-chat-input-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 1fr;
     padding-inline: 12px;
+  }
+
+  .document-chat-input-row .ant-btn {
+    width: 100%;
   }
 
   .document-workspace-link {
@@ -3098,11 +3105,47 @@ button,
   }
 
   .dashboard-hero h1 {
-    font-size: 26px;
+    font-size: 24px;
   }
 
   .hero-stat {
     min-height: 64px;
+  }
+
+  .hero-visual {
+    min-height: 150px;
+  }
+
+  .talent-card {
+    min-width: 128px;
+  }
+
+  .talent-card strong,
+  .talent-card em {
+    font-size: 11px;
+  }
+
+  .document-chat-widget {
+    top: 70px;
+    right: 8px;
+    left: 8px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 86px - env(safe-area-inset-bottom));
+    border-radius: 18px;
+  }
+
+  .document-chat-widget-title span,
+  .document-chat-widget-actions .ant-btn:first-child {
+    display: none;
+  }
+
+  .mobile-data-card,
+  .selection-card,
+  .jd-card,
+  .task-item,
+  .inline-action-box,
+  .mini-panel {
+    border-radius: 13px;
   }
 }
 
