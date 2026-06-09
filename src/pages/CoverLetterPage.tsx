@@ -6,8 +6,8 @@ import { InlineLoading } from '../components/common/InlineLoading';
 import { PageTitle } from '../components/common/PageTitle';
 import { SectionCard } from '../components/common/SectionCard';
 import type { CoverLetterDraft, CoverLetterRow, JdItem } from '../api/adapters';
-import { mockClient } from '../api/mockClient';
-import type { Navigate, RunMockAction } from '../types/app';
+import { apiClient } from '../api/backendClient';
+import type { Navigate, RunApiAction } from '../types/app';
 
 type CoverLetterPageProps = {
   jdList: JdItem[];
@@ -20,7 +20,7 @@ type CoverLetterPageProps = {
   setSelectedJdId: (id: string) => void;
   setCoverUploaded: (value: boolean) => void;
   setAnalysisDone: (value: boolean) => void;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
   navigate: Navigate;
 };
 
@@ -35,15 +35,15 @@ export function CoverLetterPage({
   setSelectedJdId,
   setCoverUploaded,
   setAnalysisDone,
-  runMockAction,
+  runApiAction,
   navigate,
 }: CoverLetterPageProps) {
   return (
     <>
       <PageTitle
-        eyebrow="Cover Letter"
-        title="자기소개서 입력"
-        description="지원자 자기소개서 단건 입력과 Excel 업로드 미리보기 UI를 제공합니다."
+        eyebrow="Resume"
+        title="지원서 입력"
+        description="Resume 컬럼 구조에 맞춰 지원자 정보와 자기소개 문항/답변 데이터를 확인합니다."
         actions={
           <Button
             type="primary"
@@ -51,9 +51,9 @@ export function CoverLetterPage({
             disabled={!selectedJdId || loadingKey === 'cover-analysis'}
             onClick={() =>
               selectedJdId &&
-              void runMockAction(
+              void runApiAction(
                 'cover-analysis',
-                () => mockClient.requestCoverLetterAnalysis(selectedJdId),
+                () => apiClient.requestCoverLetterAnalysis(selectedJdId),
                 () => setAnalysisDone(true),
               )
             }
@@ -64,7 +64,7 @@ export function CoverLetterPage({
       />
       <Row gutter={[24, 24]}>
         <Col xs={24} xl={11}>
-          <SectionCard title="단건 입력">
+          <SectionCard title="지원서 입력">
             <CoverLetterInputPanel
               selectedJdId={selectedJdId}
               jdList={jdList}
@@ -74,13 +74,13 @@ export function CoverLetterPage({
           </SectionCard>
         </Col>
         <Col xs={24} xl={13}>
-          <SectionCard title="Excel 업로드 미리보기">
+          <SectionCard title="지원서 데이터 미리보기">
             <CoverLetterUploadPanel
               draft={draft}
               coverRows={coverRows}
               coverUploaded={coverUploaded}
               analysisDone={analysisDone}
-              runMockAction={runMockAction}
+              runApiAction={runApiAction}
               setCoverUploaded={setCoverUploaded}
               navigate={navigate}
             />

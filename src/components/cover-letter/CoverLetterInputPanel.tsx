@@ -13,7 +13,7 @@ type CoverLetterInputPanelProps = {
 export function CoverLetterInputPanel({ selectedJdId, jdList, draft, setSelectedJdId }: CoverLetterInputPanelProps) {
   return (
     <Form layout="vertical">
-      <Form.Item label="분석 대상 JD">
+      <Form.Item label="연결 JD">
         <Select
           value={selectedJdId ?? undefined}
           onChange={setSelectedJdId}
@@ -24,7 +24,7 @@ export function CoverLetterInputPanel({ selectedJdId, jdList, draft, setSelected
       <Form.Item label="지원자명">
         <Input defaultValue={draft.applicantName} />
       </Form.Item>
-      <Form.Item label="자기소개서 본문">
+      <Form.Item label="자기소개 문항/답변">
         <TextArea rows={9} defaultValue={draft.body} />
       </Form.Item>
     </Form>

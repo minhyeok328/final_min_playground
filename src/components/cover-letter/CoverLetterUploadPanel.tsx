@@ -2,8 +2,8 @@ import { Button, Divider, Table, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { EmptyState } from '../common/PageState';
 import type { CoverLetterDraft, CoverLetterRow } from '../../api/adapters';
-import { mockClient } from '../../api/mockClient';
-import type { Navigate, RunMockAction } from '../../types/app';
+import { apiClient } from '../../api/backendClient';
+import type { Navigate, RunApiAction } from '../../types/app';
 import { statusTag } from '../../utils/statusTag';
 
 const { Dragger } = Upload;
@@ -13,7 +13,7 @@ type CoverLetterUploadPanelProps = {
   coverRows: CoverLetterRow[];
   coverUploaded: boolean;
   analysisDone: boolean;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
   setCoverUploaded: (value: boolean) => void;
   navigate: Navigate;
 };
@@ -23,15 +23,18 @@ export function CoverLetterUploadPanel({
   coverRows,
   coverUploaded,
   analysisDone,
-  runMockAction,
+  runApiAction,
   setCoverUploaded,
   navigate,
 }: CoverLetterUploadPanelProps) {
+  const isWarningStatus = (statusCode: CoverLetterRow['statusCode']) =>
+    statusCode === 'onqueue' || statusCode === 'processing' || statusCode === 'needs_review';
+
   return (
     <>
       <Dragger
         beforeUpload={() => {
-          void runMockAction('cover-upload', mockClient.uploadCoverLetters, () => setCoverUploaded(true));
+          void runApiAction('cover-upload', apiClient.uploadCoverLetters, () => setCoverUploaded(true));
           return false;
         }}
         showUploadList={false}
@@ -51,7 +54,7 @@ export function CoverLetterUploadPanel({
             pagination={false}
             scroll={{ x: 520 }}
             dataSource={coverRows}
-            rowClassName={(record) => (record.statusCode === 'missing_answer' ? 'warning-row' : '')}
+            rowClassName={(record) => (isWarningStatus(record.statusCode) ? 'warning-row' : '')}
             columns={[
               { title: '지원자', dataIndex: 'applicant' },
               { title: 'JD', dataIndex: 'jd' },
@@ -65,7 +68,7 @@ export function CoverLetterUploadPanel({
           />
           <div className="mobile-data-list" aria-label="Cover letter upload list">
             {coverRows.map((row) => (
-              <article className={`mobile-data-card ${row.statusCode === 'missing_answer' ? 'warning' : ''}`} key={row.key}>
+              <article className={`mobile-data-card ${isWarningStatus(row.statusCode) ? 'warning' : ''}`} key={row.key}>
                 <div className="mobile-data-card-head">
                   <div>
                     <strong>{row.applicant}</strong>
@@ -82,7 +85,7 @@ export function CoverLetterUploadPanel({
           </div>
         </>
       ) : (
-        <EmptyState description="업로드된 자기소개서가 없습니다." />
+        <EmptyState description="업로드된 지원서가 없습니다." />
       )}
       {analysisDone && (
         <Button className="mt-16" type="primary" block onClick={() => navigate('/chat')}>
