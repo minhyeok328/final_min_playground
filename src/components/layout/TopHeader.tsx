@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { Button, Input, Layout, Select, Space } from 'antd';
 import { LogoutOutlined, SearchOutlined } from '@ant-design/icons';
-import { NotificationButton } from './NotificationButton';
-import type { NotificationsData } from '../../api/adapters';
 import { mainMenu, type AppRoute } from '../../data/mockData';
 import type { Navigate } from '../../types/app';
 
@@ -11,11 +9,10 @@ const { Header } = Layout;
 type TopHeaderProps = {
   route: AppRoute;
   themeSwitch: ReactNode;
-  notifications?: NotificationsData;
   navigate: Navigate;
 };
 
-export function TopHeader({ route, themeSwitch, notifications, navigate }: TopHeaderProps) {
+export function TopHeader({ route, themeSwitch, navigate }: TopHeaderProps) {
   return (
     <Header className="top-header">
       <div className="top-title">
@@ -36,7 +33,6 @@ export function TopHeader({ route, themeSwitch, notifications, navigate }: TopHe
         aria-label="화면 선택"
       />
       <Space className="top-actions">
-        <NotificationButton notifications={notifications} />
         {themeSwitch}
         <Button className="logout-button" icon={<LogoutOutlined />} onClick={() => navigate('/login')}>
           <span className="logout-text">로그아웃</span>
