@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import { Button, Col, Flex, Form, Input, Row, Steps, Upload } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone, LoginOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Col, Flex, Form, Input, Row, Steps } from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone, LoginOutlined } from '@ant-design/icons';
 import { InlineLoading } from '../components/common/InlineLoading';
 import { AuthScreen } from '../components/layout/AuthScreen';
 import type { AuthDefaults } from '../api/adapters';
-import { mockClient } from '../api/mockClient';
-import type { Navigate, RunMockAction, ShowAlert, ThemeMode } from '../types/app';
+import { apiClient } from '../api/backendClient';
+import type { Navigate, RunApiAction, ShowAlert, ThemeMode } from '../types/app';
 
 type AuthPageBaseProps = {
   mode: ThemeMode;
@@ -13,12 +13,25 @@ type AuthPageBaseProps = {
   themeSwitch: ReactNode;
   loadingKey: string | null;
   authDefaults?: AuthDefaults;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
 };
 
 type LoginPageProps = AuthPageBaseProps;
 
-export function LoginPage({ mode, navigate, themeSwitch, loadingKey, authDefaults, runMockAction }: LoginPageProps) {
+type LoginValues = {
+  username: string;
+  password: string;
+};
+
+export function LoginPage({
+  mode,
+  navigate,
+  themeSwitch,
+  loadingKey,
+  authDefaults,
+  runApiAction,
+  onLoginSuccess,
+}: LoginPageProps & { onLoginSuccess?: () => void }) {
   return (
     <AuthScreen
       mode={mode}
@@ -27,22 +40,32 @@ export function LoginPage({ mode, navigate, themeSwitch, loadingKey, authDefault
       title="채용 데이터 입력부터 분석 리포트와 질의응답까지"
       cardTitle="로그인"
       card={
-        <Form layout="vertical">
-          <Form.Item label="아이디">
-            <Input defaultValue={authDefaults?.login.username ?? ''} />
+        <Form<LoginValues>
+          layout="vertical"
+          initialValues={{
+            username: authDefaults?.username ?? '',
+            password: authDefaults?.password ?? '',
+          }}
+          onFinish={(values) =>
+            void runApiAction(
+              'login',
+              () => apiClient.login(values.username, values.password),
+              () => onLoginSuccess?.(),
+            )
+          }
+        >
+          <Form.Item label="아이디" name="username">
+            <Input />
           </Form.Item>
-          <Form.Item label="비밀번호">
-            <Input.Password
-              defaultValue={authDefaults?.login.password ?? ''}
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-            />
+          <Form.Item label="비밀번호" name="password">
+            <Input.Password iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)} />
           </Form.Item>
           <Button
             type="primary"
             block
+            htmlType="submit"
             icon={loadingKey === 'login' ? undefined : <LoginOutlined />}
             disabled={loadingKey === 'login'}
-            onClick={() => void runMockAction('login', mockClient.login, () => navigate('/dashboard'))}
           >
             {loadingKey === 'login' ? <InlineLoading label="로그인 중" /> : '로그인'}
           </Button>
@@ -64,13 +87,21 @@ type SignupPageProps = AuthPageBaseProps & {
   showAlert: ShowAlert;
 };
 
+type SignupValues = {
+  username: string;
+  password: string;
+  name: string;
+  verification_question: string;
+  verification_answer: string;
+};
+
 export function SignupPage({
   mode,
   navigate,
   themeSwitch,
   loadingKey,
   authDefaults,
-  runMockAction,
+  runApiAction,
 }: SignupPageProps) {
   return (
     <AuthScreen
@@ -80,11 +111,21 @@ export function SignupPage({
       title="회사와 지원자 데이터를 한곳에서 관리하는 채용 보조 시스템"
       cardTitle="회원가입"
       card={
-        <Form layout="vertical">
+        <Form<SignupValues>
+          layout="vertical"
+          initialValues={{
+            username: authDefaults?.username ?? '',
+            password: authDefaults?.password ?? '',
+            name: authDefaults?.name ?? '',
+            verification_question: authDefaults?.verification_question ?? '',
+            verification_answer: authDefaults?.verification_answer ?? '',
+          }}
+          onFinish={(values) => void runApiAction('signup-complete', () => apiClient.completeSignup(values))}
+        >
           <Row gutter={12}>
             <Col span={16}>
-              <Form.Item label="아이디">
-                <Input defaultValue={authDefaults?.signup.username ?? ''} />
+              <Form.Item label="아이디" name="username">
+                <Input />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -92,29 +133,30 @@ export function SignupPage({
                 <Button
                   block
                   disabled={loadingKey === 'signup-check'}
-                  onClick={() => void runMockAction('signup-check', mockClient.checkSignupId)}
+                  onClick={() => void runApiAction('signup-check', apiClient.checkSignupId)}
                 >
                   중복 확인
                 </Button>
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="이메일">
-            <Input defaultValue={authDefaults?.signup.email ?? ''} />
+          <Form.Item label="담당자명" name="name">
+            <Input />
           </Form.Item>
-          <Form.Item label="비밀번호">
+          <Form.Item label="비밀번호" name="password">
             <Input.Password />
           </Form.Item>
-          <Form.Item label="프로필 이미지">
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button icon={<UploadOutlined />}>이미지 선택</Button>
-            </Upload>
+          <Form.Item label="본인확인 질문" name="verification_question">
+            <Input />
+          </Form.Item>
+          <Form.Item label="본인확인 답변" name="verification_answer">
+            <Input />
           </Form.Item>
           <Button
             type="primary"
             block
+            htmlType="submit"
             disabled={loadingKey === 'signup-complete'}
-            onClick={() => void runMockAction('signup-complete', mockClient.completeSignup)}
           >
             {loadingKey === 'signup-complete' ? <InlineLoading label="가입 중" /> : '가입 완료'}
           </Button>
@@ -136,16 +178,16 @@ export function PasswordResetPage({
   themeSwitch,
   loadingKey,
   authDefaults,
-  runMockAction,
+  runApiAction,
   resetStep,
   setResetStep,
 }: PasswordResetPageProps) {
   const stepContents = [
     <Form.Item label="아이디" key="id">
-      <Input defaultValue={authDefaults?.password_reset.username ?? ''} />
+      <Input defaultValue={authDefaults?.username ?? ''} />
     </Form.Item>,
     <Form.Item label="본인확인 질문" key="question">
-      <Input defaultValue={authDefaults?.password_reset.security_question ?? ''} />
+      <Input defaultValue={authDefaults?.verification_question ?? ''} />
     </Form.Item>,
     <Form.Item label="새 비밀번호" key="password">
       <Input.Password />
@@ -172,7 +214,7 @@ export function PasswordResetPage({
                 setResetStep((current) => current + 1);
                 return;
               }
-              void runMockAction('password-reset', mockClient.resetPassword, () => navigate('/login'));
+              void runApiAction('password-reset', apiClient.resetPassword, () => navigate('/login'));
             }}
           >
             {loadingKey === 'password-reset' ? <InlineLoading label="재설정 중" /> : resetStep < 2 ? '다음' : '재설정 완료'}
