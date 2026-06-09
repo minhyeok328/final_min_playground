@@ -1,6 +1,7 @@
 import { authMenu, mainMenu, type AppRoute } from '../data/mockData';
 
-const allRoutes = [...mainMenu, ...authMenu].map((item) => item.route);
+const standaloneRoutes: AppRoute[] = ['/chat'];
+const allRoutes = [...mainMenu, ...authMenu].map((item) => item.route).concat(standaloneRoutes);
 
 export const authRoutes: AppRoute[] = ['/login', '/signup', '/password-reset'];
 
