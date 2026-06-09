@@ -1901,19 +1901,33 @@ button,
   bottom: 28px;
   z-index: 18;
   display: inline-flex !important;
+  flex-direction: row-reverse;
   align-items: center;
-  gap: 10px;
-  min-width: 176px;
+  justify-content: flex-start;
+  gap: 0;
+  width: 58px;
+  min-width: 58px;
   height: 58px;
-  padding: 0 20px 0 12px !important;
+  overflow: hidden;
+  padding: 0 9px !important;
   border-radius: 999px !important;
   background: var(--primary) !important;
   border-color: transparent !important;
   box-shadow: 0 24px 56px rgba(47, 115, 246, 0.36) !important;
   cursor: pointer;
+  transition:
+    width 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    min-width 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.document-chat-fab:hover {
+.document-chat-fab:hover,
+.document-chat-fab:focus-visible {
+  gap: 10px;
+  width: 178px;
+  min-width: 178px;
+  box-shadow: 0 26px 62px rgba(47, 115, 246, 0.4) !important;
   transform: translateY(-3px);
 }
 
@@ -1926,10 +1940,47 @@ button,
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   font-size: 18px;
+  flex: 0 0 40px;
 }
 
 .document-chat-fab-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  height: 40px;
+  max-width: 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0;
   font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(10px);
+  transition:
+    flex-basis 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    max-width 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 160ms ease 80ms,
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.document-chat-fab-text::before {
+  content: "AI 문서 검색";
+  font-size: 14px;
+  line-height: 1;
+}
+
+.document-chat-fab:hover .document-chat-fab-text,
+.document-chat-fab:focus-visible .document-chat-fab-text {
+  flex-basis: 110px;
+  width: 110px;
+  max-width: 110px;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .document-chat-widget {
@@ -1937,16 +1988,158 @@ button,
   right: 28px;
   bottom: 28px;
   z-index: 24;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
   width: min(420px, calc(100vw - 40px));
   height: min(680px, calc(100vh - 40px));
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  animation: widget-pop 220ms ease both;
+}
+
+.document-chat-widget-main {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 24px;
   background: var(--surface-raised);
   box-shadow: var(--shadow-lg);
-  animation: widget-pop 220ms ease both;
+}
+
+.document-chat-recommendation-toggle {
+  position: absolute;
+  top: 118px;
+  left: -48px;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 78px;
+  padding: 10px 6px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid var(--border);
+  border-right: 0;
+  border-radius: 14px 0 0 14px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    transform 180ms ease;
+}
+
+.document-chat-recommendation-toggle:hover,
+.document-chat-recommendation-toggle:focus-visible {
+  color: #ffffff;
+  background: var(--primary);
+  transform: translateX(-2px);
+}
+
+.document-chat-widget.recommendations-open .document-chat-recommendation-toggle {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(8px);
+}
+
+.document-chat-recommendation-toggle .anticon {
+  font-size: 17px;
+}
+
+.document-chat-recommendation-panel {
+  position: absolute;
+  top: 84px;
+  right: calc(100% + 12px);
+  bottom: 12px;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 14px;
+  width: 286px;
+  min-height: 0;
+  padding: 14px;
+  overflow: auto;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(14px);
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.document-chat-widget.recommendations-open .document-chat-recommendation-panel {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.document-recommendation-panel-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.document-recommendation-panel-head strong,
+.document-recommendation-section strong,
+.document-quick-actions strong {
+  display: block;
+  color: var(--text);
+}
+
+.document-recommendation-panel-head span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.document-recommendation-panel-head .ant-btn {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.document-recommendation-section {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--primary-soft));
+}
+
+.document-recommendation-section span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.document-recommendation-section p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .document-chat-widget-header {
@@ -2017,8 +2210,11 @@ button,
 }
 
 .document-chat-widget-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   padding: 14px 0 0;
   background: var(--surface-soft);
 }
@@ -2055,7 +2251,7 @@ button,
   display: flex;
   gap: 8px;
   padding: 0 14px;
-  margin-bottom: 14px;
+  margin-bottom: 0;
   overflow-x: auto;
 }
 
@@ -2082,10 +2278,9 @@ button,
   align-content: start;
   gap: 12px;
   min-height: 0;
-  max-height: 250px;
-  margin-bottom: 14px;
+  height: 100%;
   overflow: auto;
-  padding: 0 14px 2px;
+  padding: 0 14px 14px;
 }
 
 .document-chat-window .chat-bubble {
@@ -2096,8 +2291,7 @@ button,
 .document-source-stack {
   display: grid;
   gap: 10px;
-  margin-bottom: 14px;
-  padding: 0 14px;
+  min-height: 0;
 }
 
 .document-source-title {
@@ -2138,8 +2332,9 @@ button,
 }
 
 .document-quick-actions {
-  margin-bottom: 14px;
-  padding: 0 14px;
+  display: grid;
+  gap: 9px;
+  margin: 0;
 }
 
 .document-quick-actions .ant-tag {
@@ -2357,7 +2552,9 @@ button,
   background: var(--surface-soft);
 }
 
-.app-root[data-theme="dark"] .document-chat-widget {
+.app-root[data-theme="dark"] .document-chat-widget-main,
+.app-root[data-theme="dark"] .document-chat-recommendation-panel,
+.app-root[data-theme="dark"] .document-chat-recommendation-toggle {
   background: var(--surface-raised);
 }
 
@@ -2997,6 +3194,40 @@ button,
     border-radius: 22px;
   }
 
+  .document-chat-widget-main {
+    border-radius: 22px;
+  }
+
+  .document-chat-recommendation-toggle {
+    top: 82px;
+    left: 16px;
+    flex-direction: row;
+    width: auto;
+    min-height: 36px;
+    padding: 8px 12px;
+    border-right: 1px solid var(--border);
+    border-radius: 999px;
+  }
+
+  .document-chat-recommendation-toggle:hover,
+  .document-chat-recommendation-toggle:focus-visible,
+  .document-chat-widget.recommendations-open .document-chat-recommendation-toggle {
+    transform: none;
+  }
+
+  .document-chat-recommendation-panel {
+    top: 128px;
+    right: 12px;
+    bottom: 112px;
+    left: 12px;
+    width: auto;
+    transform: translateY(12px);
+  }
+
+  .document-chat-widget.recommendations-open .document-chat-recommendation-panel {
+    transform: translateY(0);
+  }
+
   .document-chat-widget-header {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 9px;
@@ -3030,24 +3261,22 @@ button,
     padding: 12px;
   }
 
-  .document-scope-row,
-  .document-source-stack,
-  .document-quick-actions {
+  .document-scope-row {
     padding-inline: 12px;
   }
 
   .document-chat-window {
-    max-height: 23vh;
     padding-inline: 12px;
   }
 
   .document-chat-input-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
     padding-inline: 12px;
   }
 
   .document-chat-input-row .ant-btn {
-    width: 100%;
+    width: auto;
+    min-width: 72px;
   }
 
   .document-workspace-link {
@@ -3127,11 +3356,21 @@ button,
 
   .document-chat-widget {
     top: 70px;
-    right: 8px;
-    left: 8px;
-    width: calc(100vw - 16px);
-    max-height: calc(100vh - 86px - env(safe-area-inset-bottom));
+    right: 12px;
+    left: 12px;
+    width: calc(100vw - 24px);
+    max-height: none;
     border-radius: 18px;
+  }
+
+  .document-chat-widget-main,
+  .document-chat-recommendation-panel {
+    border-radius: 18px;
+  }
+
+  .document-chat-recommendation-panel {
+    right: 12px;
+    left: 12px;
   }
 
   .document-chat-widget-title span,
