@@ -72,6 +72,78 @@ async function assertNoHorizontalOverflow(page, label) {
   }
 }
 
+async function assertWidgetUsesSingleScrollModel(page, label) {
+  const scrollModel = await page.evaluate(() => {
+    const body = document.querySelector('.document-chat-widget-body');
+    const chatWindow = document.querySelector('.document-chat-window');
+    const toggle = document.querySelector('.document-chat-recommendation-toggle');
+
+    if (!body || !chatWindow || !toggle) {
+      return {
+        hasBody: Boolean(body),
+        hasChatWindow: Boolean(chatWindow),
+        hasToggle: Boolean(toggle),
+      };
+    }
+
+    const bodyStyle = window.getComputedStyle(body);
+    const chatStyle = window.getComputedStyle(chatWindow);
+
+    return {
+      hasBody: true,
+      hasChatWindow: true,
+      hasToggle: true,
+      bodyOverflowY: bodyStyle.overflowY,
+      chatOverflowY: chatStyle.overflowY,
+    };
+  });
+
+  if (!scrollModel.hasBody || !scrollModel.hasChatWindow || !scrollModel.hasToggle) {
+    throw new Error(`${label} single-scroll elements missing: ${JSON.stringify(scrollModel)}`);
+  }
+
+  if (!['hidden', 'clip'].includes(scrollModel.bodyOverflowY)) {
+    throw new Error(`${label} body should not scroll: ${JSON.stringify(scrollModel)}`);
+  }
+
+  if (!['auto', 'scroll'].includes(scrollModel.chatOverflowY)) {
+    throw new Error(`${label} chat window should be the scroll container: ${JSON.stringify(scrollModel)}`);
+  }
+}
+
+async function assertRecommendationPanel(page, label) {
+  const toggle = page.locator('.document-chat-recommendation-toggle');
+  await toggle.waitFor({ state: 'visible', timeout: 5000 });
+  await toggle.click();
+
+  const panel = page.locator('.document-chat-recommendation-panel');
+  await panel.waitFor({ state: 'visible', timeout: 5000 });
+  await panel.evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: false }).map((animation) => animation.finished.catch(() => undefined))),
+  );
+
+  const panelText = await panel.textContent();
+  if (!panelText?.includes('추천 참조 문서') || !panelText.includes('빠른 질문')) {
+    throw new Error(`${label} recommendation panel content is incomplete: ${panelText}`);
+  }
+
+  const toggleVisibleWhenOpen = await toggle.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0.01;
+  });
+
+  if (toggleVisibleWhenOpen) {
+    throw new Error(`${label} recommendation toggle should hide while panel is open`);
+  }
+}
+
+async function assertNoDuplicateWorkspaceButton(page, label) {
+  const linkCount = await page.locator('.document-workspace-link').count();
+  if (linkCount > 0) {
+    throw new Error(`${label} has duplicate full-screen workspace button`);
+  }
+}
+
 async function assertPinnedToViewport(page, locator, label, expectedInset) {
   await locator.evaluate((element) =>
     Promise.all(element.getAnimations({ subtree: false }).map((animation) => animation.finished.catch(() => undefined))),
@@ -133,6 +205,10 @@ async function verifyDesktopWidget(page) {
   }
 
   await assertNoHorizontalOverflow(page, 'desktop widget');
+  await assertWidgetUsesSingleScrollModel(page, 'desktop widget');
+  await assertNoDuplicateWorkspaceButton(page, 'desktop widget');
+  await assertRecommendationPanel(page, 'desktop widget');
+  await assertNoHorizontalOverflow(page, 'desktop recommendation panel');
   await page.screenshot({ path: resolve(screenshotDir, 'document-chat-widget-desktop.png'), fullPage: true });
 }
 
@@ -155,6 +231,10 @@ async function verifyMobileWidget(page) {
   }
 
   await assertNoHorizontalOverflow(page, 'mobile widget');
+  await assertWidgetUsesSingleScrollModel(page, 'mobile widget');
+  await assertNoDuplicateWorkspaceButton(page, 'mobile widget');
+  await assertRecommendationPanel(page, 'mobile widget');
+  await assertNoHorizontalOverflow(page, 'mobile recommendation panel');
   await page.screenshot({ path: resolve(screenshotDir, 'document-chat-widget-mobile.png'), fullPage: true });
 }
 
