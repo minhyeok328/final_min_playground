@@ -4,7 +4,6 @@ import {
   CreditCardOutlined,
   LogoutOutlined,
   MenuOutlined,
-  RightOutlined,
   SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -60,14 +59,13 @@ function AccountMenu({
           <small>{email}</small>
         </div>
       </div>
-      <button className="account-menu-item" onClick={() => moveTo('/mypage')}>
-        <UserOutlined />
+      <div className="account-theme-row">
         <span>
-          <strong>마이페이지 바로가기</strong>
-          <small>프로필과 보안 설정</small>
+          <SettingOutlined />
+          라이트 / 다크 모드
         </span>
-        <RightOutlined />
-      </button>
+        {themeSwitch}
+      </div>
       <div className="account-credit-panel">
         <div>
           <CreditCardOutlined />
@@ -85,13 +83,13 @@ function AccountMenu({
           충전 문의
         </button>
       </div>
-      <div className="account-theme-row">
+      <button className="account-menu-item" onClick={() => moveTo('/mypage')}>
+        <UserOutlined />
         <span>
-          <SettingOutlined />
-          라이트 / 다크 모드
+          <strong>마이페이지 바로가기</strong>
+          <small>프로필과 보안 설정</small>
         </span>
-        {themeSwitch}
-      </div>
+      </button>
       <button className="account-menu-item danger" onClick={() => moveTo('/login')}>
         <LogoutOutlined />
         <span>
