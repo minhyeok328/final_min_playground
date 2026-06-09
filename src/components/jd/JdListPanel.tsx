@@ -21,7 +21,7 @@ export function JdListPanel({ jdList, selectedJdId, setSelectedJdId }: JdListPan
           <span>{item.team}</span>
           <div>
             {statusTag(item.status, item.statusCode)}
-            <Tag color="blue">Fit {item.fit}%</Tag>
+            <Tag color="blue">평균 {item.fit}점</Tag>
           </div>
         </button>
       ))}

@@ -7,8 +7,8 @@ import { InlineLoading } from '../components/common/InlineLoading';
 import { PageTitle } from '../components/common/PageTitle';
 import { SectionCard } from '../components/common/SectionCard';
 import type { JdItem } from '../api/adapters';
-import { mockClient } from '../api/mockClient';
-import type { Navigate, RunMockAction, ShowAlert } from '../types/app';
+import { apiClient } from '../api/backendClient';
+import type { Navigate, RunApiAction, ShowAlert } from '../types/app';
 
 type JdPageProps = {
   jdList: JdItem[];
@@ -16,7 +16,7 @@ type JdPageProps = {
   selectedJd: JdItem | null;
   loadingKey: string | null;
   setSelectedJdId: (id: string) => void;
-  runMockAction: RunMockAction;
+  runApiAction: RunApiAction;
   navigate: Navigate;
   showAlert: ShowAlert;
 };
@@ -27,7 +27,7 @@ export function JdPage({
   selectedJd,
   loadingKey,
   setSelectedJdId,
-  runMockAction,
+  runApiAction,
   navigate,
   showAlert,
 }: JdPageProps) {
@@ -48,9 +48,9 @@ export function JdPage({
               disabled={!selectedJd || loadingKey === 'jd-analysis'}
               onClick={() =>
                 selectedJd &&
-                void runMockAction(
+                void runApiAction(
                   'jd-analysis',
-                  () => mockClient.requestJobAnalysis(selectedJd.id),
+                  () => apiClient.requestJobAnalysis(selectedJd.id),
                   () => navigate('/cover-letter'),
                 )
               }

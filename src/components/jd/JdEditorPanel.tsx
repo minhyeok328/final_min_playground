@@ -16,20 +16,20 @@ export function JdEditorPanel({ selectedJd, navigate, showAlert }: JdEditorPanel
     <Form layout="vertical">
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item label="직무명">
+          <Form.Item label="JD명">
             <Input value={selectedJd.title} readOnly />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item label="소속 팀">
-            <Input value={selectedJd.team} readOnly />
+          <Form.Item label="전공 요건">
+            <Input value={selectedJd.major} readOnly />
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item label="직무 요약">
+      <Form.Item label="주요 업무">
         <TextArea rows={4} value={selectedJd.summary} readOnly />
       </Form.Item>
-      <Form.Item label="기술 스택">
+      <Form.Item label="필수 기술">
         <Space wrap>
           {selectedJd.stack.map((stack) => (
             <Tag className="large-tag" key={stack}>
@@ -45,17 +45,29 @@ export function JdEditorPanel({ selectedJd, navigate, showAlert }: JdEditorPanel
           </Button>
         </Space>
       </Form.Item>
+      <Form.Item label="우대 기술">
+        <Space wrap>
+          {selectedJd.preferredStack.map((stack) => (
+            <Tag className="large-tag" key={stack}>
+              {stack}
+            </Tag>
+          ))}
+        </Space>
+      </Form.Item>
+      <Form.Item label="채용 배경">
+        <TextArea rows={3} value={selectedJd.hiringReason} readOnly />
+      </Form.Item>
       <Row gutter={16}>
         <Col xs={24} md={8}>
           <div className="mini-panel">
-            <span className="form-stat-label">분석 적합도</span>
+            <span className="form-stat-label">평균 등급 점수</span>
             <Progress percent={selectedJd.fit} />
           </div>
         </Col>
         <Col xs={24} md={8}>
           <div className="mini-panel">
-            <span className="form-stat-label">요구 경력</span>
-            <strong>{selectedJd.requiredExperience}</strong>
+            <span className="form-stat-label">학력</span>
+            <strong>{selectedJd.educationLevel}</strong>
           </div>
         </Col>
         <Col xs={24} md={8}>
