@@ -1663,6 +1663,70 @@ button,
   background: rgba(245, 158, 11, 0.09) !important;
 }
 
+.mobile-data-list {
+  display: none;
+}
+
+.mobile-data-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--primary-soft));
+}
+
+.mobile-data-card.warning {
+  background: color-mix(in srgb, rgba(245, 158, 11, 0.12) 72%, var(--surface));
+}
+
+.mobile-data-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mobile-data-card-head div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mobile-data-card-head strong {
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.mobile-data-card-head span,
+.mobile-data-progress span,
+.mobile-data-score span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mobile-data-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.mobile-data-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: var(--surface);
+}
+
+.mobile-data-score strong {
+  color: var(--primary);
+  font-size: 20px;
+}
+
 .desktop-table-wrap {
   min-width: 0;
 }
@@ -2825,8 +2889,64 @@ button,
     grid-template-columns: 1fr;
   }
 
+  .hero-summary {
+    gap: 12px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .summary-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .summary-profile strong,
+  .summary-metrics strong {
+    font-size: 15px;
+  }
+
+  .summary-metrics {
+    gap: 8px;
+  }
+
+  .summary-metrics div {
+    padding: 11px;
+    border-radius: 13px;
+  }
+
   .metric-card {
-    min-height: 138px;
+    min-height: 118px;
+  }
+
+  .metric-card .ant-card-body {
+    gap: 10px;
+    padding: 14px !important;
+  }
+
+  .metric-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+    font-size: 18px;
+  }
+
+  .metric-card .ant-statistic-content {
+    font-size: 26px;
+  }
+
+  .metric-change {
+    padding: 4px 9px;
+    font-size: 11px;
+  }
+
+  .desktop-data-table {
+    display: none;
+  }
+
+  .mobile-data-list {
+    display: grid;
+    gap: 10px;
   }
 
   .desktop-table-wrap {
