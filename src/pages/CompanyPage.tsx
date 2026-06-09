@@ -40,7 +40,7 @@ export function CompanyPage({ company, companyChoices, loadingKey, runMockAction
           </Space>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={15}>
           <SectionCard title="회사 프로필">
             <CompanyProfileForm company={company} choices={companyChoices} showAlert={showAlert} />

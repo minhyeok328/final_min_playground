@@ -60,7 +60,7 @@ export function RecruitmentPostPage({
           </Space>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={13}>
           <SectionCard title="JD 선택">
             <JdSelectionPanel jdList={jdList} selectedRows={selectedRows} setSelectedRows={setSelectedRows} />

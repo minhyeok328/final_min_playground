@@ -39,7 +39,7 @@ export function ChatPage({
           </Button>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={9}>
           <SectionCard title="검색 컨텍스트">
             <DocumentSearchContextPanel setChatInput={setChatInput} />

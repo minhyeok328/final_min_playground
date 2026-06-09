@@ -62,7 +62,7 @@ export function CoverLetterPage({
           </Button>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={11}>
           <SectionCard title="단건 입력">
             <CoverLetterInputPanel

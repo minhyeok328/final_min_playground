@@ -32,14 +32,14 @@ export function MyPage({ profile, company, companyChoices, creditPercent, naviga
           </Button>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={8}>
           <SectionCard title="프로필">
             <ProfileSummaryCard profile={profile} creditPercent={creditPercent} />
           </SectionCard>
         </Col>
         <Col xs={24} xl={16}>
-          <Row gutter={[22, 22]}>
+          <Row gutter={[24, 24]}>
             <Col xs={24} lg={12}>
               <SectionCard title="계정 정보">
                 <AccountSettingsForm profile={profile} choices={companyChoices} />

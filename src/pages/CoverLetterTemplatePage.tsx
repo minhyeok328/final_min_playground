@@ -54,7 +54,7 @@ export function CoverLetterTemplatePage({
           </Space>
         }
       />
-      <Row gutter={[22, 22]}>
+      <Row gutter={[24, 24]}>
         <Col xs={24} xl={8}>
           <SectionCard title="JD 요약">
             {selectedJd ? (
