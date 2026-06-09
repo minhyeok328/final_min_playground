@@ -4,7 +4,7 @@ import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { PageError, PageLoading } from './components/common/PageState';
 import { DocumentChatFab } from './components/chat/DocumentChatFab';
 import { AppShell } from './components/layout/AppShell';
-import { mockClient } from './api/mockClient';
+import { apiClient } from './api/backendClient';
 import { palette, type AppRoute, type ChatMessage } from './data/mockData';
 import { useMockAppData } from './hooks/useMockAppData';
 import { LoginPage, PasswordResetPage, SignupPage } from './pages/AuthPages';
@@ -104,7 +104,7 @@ export default function App() {
     window.setTimeout(() => setAlert(null), 3400);
   };
 
-  const runMockAction = async <T,>(
+  const runApiAction = async <T,>(
     key: string,
     action: () => Promise<{ status_code: number; message: string; data: T }>,
     afterComplete?: (response: { status_code: number; message: string; data: T }) => void,
@@ -124,7 +124,7 @@ export default function App() {
     } catch (nextError) {
       showAlert({
         type: 'error',
-        message: '목업 API 요청이 실패했습니다.',
+        message: 'API 요청이 실패했습니다.',
         description: nextError instanceof Error ? nextError.message : undefined,
       });
     } finally {
@@ -145,7 +145,7 @@ export default function App() {
 
     setChatMessages([...activeChatMessages, { role: 'user', text: trimmed }]);
     setChatInput('');
-    void runMockAction('chat', () => mockClient.sendChatMessage(trimmed), (response) =>
+    void runApiAction('chat', () => apiClient.sendChatMessage(trimmed), (response) =>
       setChatMessages((prev) => [...prev, response.data]),
     );
   };
@@ -180,9 +180,8 @@ export default function App() {
         return (
           <CompanyPage
             company={data.company}
-            companyChoices={data.companyChoices}
             loadingKey={loadingKey}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
             showAlert={showAlert}
           />
         );
@@ -193,8 +192,8 @@ export default function App() {
             selectedJdId={selectedJdId}
             selectedJd={selectedJd}
             loadingKey={loadingKey}
-                  setSelectedJdId={setSelectedJdIdOverride}
-            runMockAction={runMockAction}
+            setSelectedJdId={setSelectedJdIdOverride}
+            runApiAction={runApiAction}
             navigate={navigate}
             showAlert={showAlert}
           />
@@ -212,7 +211,7 @@ export default function App() {
             setSelectedJdId={setSelectedJdIdOverride}
             setCoverUploaded={setCoverUploaded}
             setAnalysisDone={setAnalysisDone}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
             navigate={navigate}
           />
         );
@@ -233,10 +232,9 @@ export default function App() {
           <MyPage
             profile={data.userProfile}
             company={data.company}
-            companyChoices={data.companyChoices}
             creditPercent={data.dashboard.creditPercent}
             navigate={navigate}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
           />
         );
       case '/recruitment-post':
@@ -249,7 +247,7 @@ export default function App() {
             loadingKey={loadingKey}
             setSelectedRows={updateSelectedRows}
             setPostGenerated={setPostGenerated}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
           />
         );
       case '/cover-letter-template':
@@ -260,7 +258,7 @@ export default function App() {
             templateGenerated={templateGenerated}
             loadingKey={loadingKey}
             setTemplateGenerated={setTemplateGenerated}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
           />
         );
       case '/dashboard':
@@ -289,7 +287,7 @@ export default function App() {
             themeSwitch={themeSwitch}
             loadingKey={loadingKey}
             authDefaults={authDefaults}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
             showAlert={showAlert}
           />
         );
@@ -301,7 +299,7 @@ export default function App() {
             themeSwitch={themeSwitch}
             loadingKey={loadingKey}
             authDefaults={authDefaults}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
             resetStep={resetStep}
             setResetStep={setResetStep}
             showAlert={showAlert}
@@ -316,7 +314,8 @@ export default function App() {
             themeSwitch={themeSwitch}
             loadingKey={loadingKey}
             authDefaults={authDefaults}
-            runMockAction={runMockAction}
+            runApiAction={runApiAction}
+            onLoginSuccess={() => void reload().then(() => navigate('/dashboard'))}
           />
         );
     }
