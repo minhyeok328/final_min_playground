@@ -15,7 +15,7 @@ export type Navigate = (route: AppRoute) => void;
 
 export type ShowAlert = (alert: AlertState) => void;
 
-export type RunMockAction = <T>(
+export type RunApiAction = <T>(
   key: string,
   action: () => Promise<ApiResponse<T>>,
   afterComplete?: (response: ApiResponse<T>) => void,
