@@ -1,4 +1,5 @@
-import { Button, Col, Row, Space, Tag } from 'antd';
+import { Prompts, Sources } from '@ant-design/x';
+import { Col, Row } from 'antd';
 import {
   AuditOutlined,
   BookOutlined,
@@ -40,10 +41,30 @@ const documentCollections = [
 ];
 
 const sourceExamples = [
-  '면접 평가 기준 v3',
-  '채용 운영 가이드',
-  'Frontend Engineer JD',
-  '자기소개서 분석 리포트',
+  {
+    key: 'interview-rubric',
+    title: '면접 평가 기준 v3',
+    description: '직무 적합도와 리스크 질문 기준',
+    icon: <HistoryOutlined />,
+  },
+  {
+    key: 'recruiting-guide',
+    title: '채용 운영 가이드',
+    description: '서류 검토와 면접 추천 흐름',
+    icon: <HistoryOutlined />,
+  },
+  {
+    key: 'frontend-jd',
+    title: 'Frontend Engineer JD',
+    description: '직무 요건과 우대 스킬 기준',
+    icon: <HistoryOutlined />,
+  },
+  {
+    key: 'cover-letter-report',
+    title: '자기소개서 분석 리포트',
+    description: '지원자 리스크와 확인 포인트',
+    icon: <HistoryOutlined />,
+  },
 ];
 
 const suggestedQuestions = [
@@ -80,26 +101,28 @@ export function DocumentSearchContextPanel({ setChatInput }: DocumentSearchConte
       </Row>
 
       <div className="document-source-preview">
-        <div className="document-source-title">
-          <HistoryOutlined />
-          <strong>최근 참조 소스</strong>
-        </div>
-        <Space wrap>
-          {sourceExamples.map((source) => (
-            <Tag key={source}>{source}</Tag>
-          ))}
-        </Space>
+        <Sources
+          items={sourceExamples}
+          onClick={(source) => setChatInput(`${String(source.title)} 참고해서 찾아줘`)}
+          title={
+            <span className="document-source-title">
+              <HistoryOutlined />
+              <strong>최근 참조 소스</strong>
+            </span>
+          }
+        />
       </div>
 
       <div className="document-suggestions">
-        <strong>추천 질문</strong>
-        <Space wrap>
-          {suggestedQuestions.map((question) => (
-            <Button key={question} size="small" onClick={() => setChatInput(question)}>
-              {question}
-            </Button>
-          ))}
-        </Space>
+        <Prompts
+          items={suggestedQuestions.map((question) => ({
+            key: question,
+            label: question,
+          }))}
+          onItemClick={({ data }) => setChatInput(String(data.label ?? data.key))}
+          title="추천 질문"
+          wrap
+        />
       </div>
     </div>
   );
