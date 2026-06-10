@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type Key } from 'react';
-import { Alert, App as AntApp, ConfigProvider, Switch, Tooltip, theme as antdTheme } from 'antd';
+import { XProvider } from '@ant-design/x';
+import { Alert, App as AntApp, Switch, Tooltip, theme as antdTheme } from 'antd';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
 import { PageError, PageLoading } from './components/common/PageState';
 import { DocumentChatFab } from './components/chat/DocumentChatFab';
@@ -324,7 +325,7 @@ export default function App() {
   const isAuth = authRoutes.includes(route);
 
   return (
-    <ConfigProvider theme={themeConfig}>
+    <XProvider theme={themeConfig}>
       <AntApp>
         <div className="app-root" data-theme={mode}>
           {alert && (
@@ -368,6 +369,6 @@ export default function App() {
           )}
         </div>
       </AntApp>
-    </ConfigProvider>
+    </XProvider>
   );
 }
