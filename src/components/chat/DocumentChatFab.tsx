@@ -1,12 +1,12 @@
-import { useState, type FormEvent } from 'react';
-import { Button, Input, Space, Tag } from 'antd';
+import { useState } from 'react';
+import { Bubble, Prompts, Sender, Sources, type BubbleItemType } from '@ant-design/x';
+import { Button } from 'antd';
 import {
   BookOutlined,
   CloseOutlined,
   FileSearchOutlined,
   FullscreenOutlined,
   MinusOutlined,
-  SendOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { InlineLoading } from '../common/InlineLoading';
@@ -26,12 +26,16 @@ const scopeOptions = ['전체 문서', '회사 정책', 'JD', '분석 리포트'
 
 const sourceCards = [
   {
+    key: 'interview-rubric',
     title: '면접 평가 기준 v3',
-    detail: '직무 적합도, 협업 역량, 리스크 질문 기준',
+    description: '직무 적합도, 협업 역량, 리스크 질문 기준',
+    icon: <FileSearchOutlined />,
   },
   {
+    key: 'recruiting-guide',
     title: '채용 운영 가이드',
-    detail: '서류 검토, 면접 추천, 최종 검토 워크플로',
+    description: '서류 검토, 면접 추천, 최종 검토 워크플로',
+    icon: <BookOutlined />,
   },
 ];
 
@@ -69,10 +73,36 @@ export function DocumentChatFab({
     setRecommendationsOpen(false);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     sendChatMessage();
   };
+
+  const bubbleItems: BubbleItemType[] = [
+    {
+      key: 'document-intro',
+      role: 'ai',
+      content: `${scope}에서 질문과 관련된 사내 근거를 찾아 요약해 드릴게요.`,
+      header: 'HumouR AI',
+    },
+    ...chatMessages.map((message, index) => ({
+      key: `${message.role}-${index}`,
+      role: message.role === 'assistant' ? 'ai' : 'user',
+      content: message.text,
+      header: message.role === 'assistant' ? 'HumouR AI' : '채용 담당자',
+    })),
+  ];
+
+  if (loadingKey === 'chat') {
+    bubbleItems.push({
+      key: 'document-chat-loading',
+      role: 'ai',
+      content: '문서 검색 중',
+      header: 'HumouR AI',
+      loading: true,
+      loadingRender: () => <InlineLoading label="문서 검색 중" />,
+      status: 'loading',
+    });
+  }
 
   return (
     <>
@@ -133,29 +163,28 @@ export function DocumentChatFab({
               <p>범위를 바꾸면 채팅의 문서 검색 기준도 함께 바뀝니다.</p>
             </div>
 
-            <div className="document-source-stack">
-              <div className="document-source-title">
-                <FileSearchOutlined />
-                <strong>추천 참조 문서</strong>
-              </div>
-              {sourceCards.map((source) => (
-                <button className="document-source-card" key={source.title} onClick={() => selectSuggestion(source.title)}>
-                  <strong>{source.title}</strong>
-                  <span>{source.detail}</span>
-                </button>
-              ))}
-            </div>
+            <Sources
+              className="document-source-stack"
+              items={sourceCards}
+              onClick={(source) => selectSuggestion(String(source.title))}
+              title={
+                <span className="document-source-title">
+                  <FileSearchOutlined />
+                  <strong>추천 참조 문서</strong>
+                </span>
+              }
+            />
 
-            <div className="document-quick-actions">
-              <strong>빠른 질문</strong>
-              <Space wrap>
-                {quickQuestions.map((question) => (
-                  <Tag key={question} onClick={() => selectSuggestion(question)}>
-                    {question}
-                  </Tag>
-                ))}
-              </Space>
-            </div>
+            <Prompts
+              className="document-quick-actions"
+              items={quickQuestions.map((question) => ({
+                key: question,
+                label: question,
+              }))}
+              onItemClick={({ data }) => selectSuggestion(String(data.label ?? data.key))}
+              title="빠른 질문"
+              wrap
+            />
           </aside>
 
           <div className="document-chat-widget-main">
@@ -196,35 +225,40 @@ export function DocumentChatFab({
               </div>
 
               <div className="document-chat-window">
-                <div className="chat-bubble assistant">
-                  <span>HumouR AI</span>
-                  <p>{scope}에서 질문과 관련된 사내 근거를 찾아 요약해 드릴게요.</p>
-                </div>
-                {chatMessages.map((message, index) => (
-                  <div className={`chat-bubble ${message.role}`} key={`${message.role}-${index}`}>
-                    <span>{message.role === 'assistant' ? 'HumouR AI' : '채용 담당자'}</span>
-                    <p>{message.text}</p>
-                  </div>
-                ))}
-                {loadingKey === 'chat' && (
-                  <div className="chat-bubble assistant">
-                    <span>HumouR AI</span>
-                    <InlineLoading label="문서 검색 중" />
-                  </div>
-                )}
+                <Bubble.List
+                  autoScroll
+                  items={bubbleItems}
+                  role={{
+                    ai: {
+                      className: 'chat-bubble-x assistant',
+                      placement: 'start',
+                      shape: 'round',
+                      typing: { effect: 'fade-in' },
+                      variant: 'shadow',
+                    },
+                    user: {
+                      className: 'chat-bubble-x user',
+                      placement: 'end',
+                      shape: 'round',
+                      variant: 'filled',
+                    },
+                  }}
+                />
               </div>
             </div>
 
-            <form className="document-chat-input-row" onSubmit={handleSubmit}>
-              <Input
-                value={chatInput}
-                onChange={(event) => setChatInput(event.target.value)}
+            <div className="document-chat-input-row">
+              <Sender
+                autoSize={{ minRows: 1, maxRows: 3 }}
+                disabled={loadingKey === 'chat'}
+                loading={loadingKey === 'chat'}
+                onChange={setChatInput}
+                onSubmit={handleSubmit}
                 placeholder="사내 문서에 대해 질문하기"
+                submitType="enter"
+                value={chatInput}
               />
-              <Button type="primary" htmlType="submit" icon={<SendOutlined />} disabled={loadingKey === 'chat'}>
-                전송
-              </Button>
-            </form>
+            </div>
 
           </div>
         </section>
