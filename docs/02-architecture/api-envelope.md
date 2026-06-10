@@ -1,10 +1,10 @@
 # API 공통 응답 형식
 
-백엔드 연동은 Django 명세의 `{ error, data, message }` 구조를 사용합니다. 프론트 내부에서는 액션 토스트와 어댑터 호환을 위해 [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts)의 `ApiResponse<T>` 형태로 한 번 감쌉니다.
+backend 연동은 Django 명세의 `{ error, data, message }` 구조를 기준으로 합니다. 프론트엔드 내부에서는 화면 상태와 알림 처리를 일정하게 유지하기 위해 [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts)의 `ApiResponse<T>` 형태로 한 번 감쌉니다.
 
-## 백엔드 응답 래퍼
+## backend 응답
 
-데이터 조회 성공:
+조회 성공:
 
 ```json
 {
@@ -13,21 +13,21 @@
 }
 ```
 
-에러:
+오류:
 
 ```json
 {
   "error": true,
-  "message": "에러 메시지"
+  "message": "오류 메시지"
 }
 ```
 
-## 프론트 내부 래퍼
+## 프론트엔드 내부 응답
 
 ```json
 {
   "status_code": 200,
-  "message": "사람이 읽는 결과 메시지",
+  "message": "사용자가 읽는 결과 메시지",
   "data": {},
   "meta": {
     "page": 1,
@@ -40,27 +40,36 @@
 
 | 필드 | 설명 |
 |------|------|
-| `status_code` | HTTP와 별도 비즈니스 코드(목업은 200 위주). 4xx/5xx 시 프론트는 Alert `error` |
-| `message` | 토스트/Alert 문구 |
-| `data` | 실제 payload (snake_case) |
-| `meta` | 선택. 페이지네이션·요청 시각 |
+| `status_code` | UI 내부 상태 코드. mock 응답은 대부분 200 |
+| `message` | Ant Design Alert에 표시되는 문구 |
+| `data` | 실제 payload |
+| `meta` | 선택값. 요청 시각, 페이지 정보 등 |
 
-## 상태 코드 enum (`status_code` in data rows)
+## axios 처리 규칙
 
-지원자·JD·자소서 행 등에 쓰이는 `StatusCode` ([`apiMockData.ts`](../../src/data/apiMockData.ts)):
+[`src/api/backendClient.ts`](../../src/api/backendClient.ts)는 다음을 공통 처리합니다.
+
+1. `axios.create({ baseURL: '/api', withCredentials: true })`로 client 생성
+2. POST 요청 전 쿠키의 `csrftoken` 확인
+3. 토큰이 없으면 `GET /api/csrf/` 호출
+4. `X-CSRFToken` 헤더 추가
+5. axios 응답과 backend envelope를 `ApiResponse<T>`로 변환
+6. axios error 또는 `error: true` 응답은 `Error.message`로 정규화
+
+## 상태 코드 enum
+
+지원자, JD, 자소서 행 상태에 쓰는 `StatusCode`는 [`src/data/apiMockData.ts`](../../src/data/apiMockData.ts)에 정의되어 있습니다.
 
 `prepare`, `on_going`, `closed`, `onqueue`, `processing`, `done`, `reviewed`, `needs_review`, `grade_a`, `grade_b`, `grade_c`, `grade_d`, `grade_f`, `normal`
 
-UI는 [`src/utils/statusTag.tsx`](../../src/utils/statusTag.tsx)에서 `status_code` → Ant Design Tag 색으로 매핑합니다.
+UI 표시 변환은 [`src/utils/statusTag.tsx`](../../src/utils/statusTag.tsx)가 담당합니다.
 
-## Django 권장 사항
+## 데이터 변환
 
-1. **JSON 필드는 snake_case** — `adapters.ts`가 camelCase로 변환합니다.
-2. **CSRF 쿠키 기반 인증** — `backendClient.ts`가 `/api/csrf/` 호출 후 `X-CSRFToken`을 붙입니다.
-3. **빈 성공 응답** — `modify` 계열이 body 없이 성공할 수 있어 프론트는 빈 2xx 응답도 성공으로 처리합니다.
+[`src/api/adapters.ts`](../../src/api/adapters.ts)는 backend snake_case 필드를 UI 모델에 맞게 변환합니다.
 
-## 어댑터
+예:
 
-[`src/api/adapters.ts`](../../src/api/adapters.ts): 예) `job_name` → `title`, `overall_grade` → 화면용 점수.
-
-Django가 snake_case를 유지하면 프론트 매핑 레이어를 그대로 사용할 수 있습니다.
+- `job_name` → `title`
+- `overall_grade` → 화면용 점수
+- `company_info` → 회사 프로필 카드 데이터
