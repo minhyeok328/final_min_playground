@@ -124,6 +124,8 @@ export type TemplateQuestion = {
 export type UserProfile = {
   displayName: string;
   username: string;
+  email?: string;
+  avatarUrl?: string;
   roleName: string;
   companyName: string;
   credit: number;
