@@ -1,5 +1,4 @@
-import { Button, Input } from 'antd';
-import { SendOutlined } from '@ant-design/icons';
+import { Bubble, Sender, type BubbleItemType } from '@ant-design/x';
 import { InlineLoading } from '../common/InlineLoading';
 import type { ChatMessage } from '../../data/mockData';
 
@@ -26,32 +25,59 @@ export function ChatWindowPanel({
   setChatInput,
   sendChatMessage,
 }: ChatWindowPanelProps) {
+  const bubbleItems: BubbleItemType[] = chatMessages.map((message, index) => ({
+    key: `${message.role}-${index}`,
+    role: message.role === 'assistant' ? 'ai' : 'user',
+    content: message.text,
+    header: message.role === 'assistant' ? assistantLabel : userLabel,
+  }));
+
+  if (loadingKey === 'chat') {
+    bubbleItems.push({
+      key: 'chat-loading',
+      role: 'ai',
+      content: loadingLabel,
+      header: assistantLabel,
+      loading: true,
+      loadingRender: () => <InlineLoading label={loadingLabel} />,
+      status: 'loading',
+    });
+  }
+
   return (
     <>
       <div className="chat-window">
-        {chatMessages.map((message, index) => (
-          <div className={`chat-bubble ${message.role}`} key={`${message.role}-${index}`}>
-            <span>{message.role === 'assistant' ? assistantLabel : userLabel}</span>
-            <p>{message.text}</p>
-          </div>
-        ))}
-        {loadingKey === 'chat' && (
-          <div className="chat-bubble assistant">
-            <span>{assistantLabel}</span>
-            <InlineLoading label={loadingLabel} />
-          </div>
-        )}
+        <Bubble.List
+          autoScroll
+          items={bubbleItems}
+          role={{
+            ai: {
+              className: 'chat-bubble-x assistant',
+              placement: 'start',
+              shape: 'round',
+              typing: { effect: 'fade-in' },
+              variant: 'shadow',
+            },
+            user: {
+              className: 'chat-bubble-x user',
+              placement: 'end',
+              shape: 'round',
+              variant: 'filled',
+            },
+          }}
+        />
       </div>
       <div className="chat-input-row">
-        <Input
-          value={chatInput}
-          onChange={(event) => setChatInput(event.target.value)}
-          onPressEnter={sendChatMessage}
+        <Sender
+          autoSize={{ minRows: 1, maxRows: 4 }}
+          disabled={loadingKey === 'chat'}
+          loading={loadingKey === 'chat'}
+          onChange={setChatInput}
+          onSubmit={() => sendChatMessage()}
           placeholder={inputPlaceholder}
+          submitType="enter"
+          value={chatInput}
         />
-        <Button type="primary" icon={<SendOutlined />} disabled={loadingKey === 'chat'} onClick={sendChatMessage}>
-          전송
-        </Button>
       </div>
     </>
   );
