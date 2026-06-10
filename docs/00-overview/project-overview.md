@@ -1,58 +1,56 @@
 # 프로젝트 개요
 
+`final_min_playground`는 SKN26 파이널 프로젝트 **HumouR**의 프론트엔드 UI 목업 저장소입니다. 채용 담당자가 회사 정보, JD, 지원서, 분석 리포트, 면접 질문 흐름을 한 화면 제품처럼 탐색할 수 있도록 구성합니다.
+
 ## 목적
 
-SKN26 파이널 **HumouR** 채용 보조 서비스의 **UI 고도화·레이아웃 목업** 저장소(`final_min_playground`)입니다.
+- 해시 라우팅으로 전체 화면 흐름을 빠르게 확인합니다.
+- 로그인, 회원가입, 비밀번호 재설정은 현재 mock 응답으로 통과시킵니다.
+- 실제 backend 연동을 위해 API 호출 계층은 axios 기반으로 준비합니다.
+- backend 명세가 부족한 영역은 로컬 mock 데이터로 보완합니다.
 
-- Ant Design으로 폼·테이블·카드·알림·사이드 레이아웃을 구성합니다.
-- ECharts로 대시보드 적합도 도넛 차트를 표시합니다.
-- `styles.css` CSS 변수와 Ant Design `ConfigProvider`로 **운영형 SaaS** 느낌의 비주얼·모션을 적용합니다.
-- 해시 라우팅(`#/dashboard`, `#/jd` …)으로 전체 화면 흐름을 탐색합니다.
-- backend JSON API **계약**을 실제 endpoint 호출 기준으로 맞추고, 명세가 부족한 영역만 로컬 샘플 데이터로 보완합니다.
-
-**이 레포는 UI 고도화·디자인 실험용**이며, HumouR 메인 백엔드/배포 저장소와 분리되어 있습니다.
-
-## UI 고도화 작업 (현재)
+## 현재 구현 범위
 
 | 영역 | 구현 위치 | 요약 |
 |------|-----------|------|
-| 디자인 토큰 | `src/styles.css`, `App.tsx` `ConfigProvider` | 블루 계열 primary, 소프트 배경, 카드·그림자·radius |
-| 앱 셸 | `AppShell`, `SidebarNav`, `TopHeader` | 밝은 사이드바, 스티키 헤더, 데스크톱 검색, 모바일 라우트 셀렉트 |
-| 대시보드 | `DashboardHero`, `DashboardMetrics`, … | 히어로 패널, 아이콘 지표 카드, 지원자·분석·할 일 섹션 |
-| AI 문서 검색 | `DocumentChatFab`, `ChatPage` | 전역 플로팅 위젯 + `#/chat` 전체 화면, 앱 레벨 채팅 상태 공유 |
-| 검증 | `scripts/verify-document-chat-widget.mjs` | Playwright로 위젯 UI 캡처 (선택) |
+| 라우팅 | `src/App.tsx`, `src/utils/routes.ts` | `#/dashboard`, `#/login` 등 해시 라우팅 |
+| 레이아웃 | `src/components/layout/` | 사이드바, 모바일 헤더, 인증 화면 |
+| 대시보드 | `src/components/dashboard/` | 지표, 지원자 테이블, 분석 요약 |
+| 차트 | `src/components/charts/` | ECharts wrapper와 donut chart |
+| AI 문서 검색 | `src/components/chat/`, `src/pages/ChatPage.tsx` | 플로팅 위젯과 전체 채팅 화면 |
+| API client | `src/api/backendClient.ts` | axios, CSRF, mock/real API 전환 |
+| 데이터 변환 | `src/api/adapters.ts` | backend snake_case 데이터를 UI 모델로 변환 |
 
-설계 스펙: [design-system-upgrade-design.md](../superpowers/specs/2026-06-04-design-system-upgrade-design.md)
-
-## 현재 백엔드 연동 상태
+## API 연동 상태
 
 | 항목 | 상태 |
 |------|------|
-| HTTP / Django | `backendClient.ts`가 `/api/{endpoint}/` 형식의 backend 명세 endpoint 호출 |
-| 인증·세션 | 쿠키 기반 세션 + `GET /api/csrf/`로 CSRF 토큰 발급 |
-| 폼 mutation | `login`, `signin`, `account/modify`, `compinfo/modify`, `resume/analize` 등 명세 endpoint 호출 |
-| 어댑터 | `adapters.ts`가 실제 snake_case 응답을 UI camelCase 모델로 변환 |
+| 기본 모드 | mock API. backend 없이 페이지 라우팅과 화면 확인 가능 |
+| 실제 호출 모드 | `VITE_USE_MOCK_API=false`일 때 axios로 `/api/{endpoint}/` 호출 |
+| 인증·세션 | 쿠키 기반 세션, `GET /api/csrf/` 후 `X-CSRFToken` 헤더 |
+| 요청 공통 설정 | `axios.create({ baseURL: '/api', withCredentials: true })` |
+| 응답 계약 | backend `{ error, data, message }` → UI 내부 `{ status_code, message, data }` |
 
-아직 명세가 없는 채팅, 문서 다운로드, username 중복 확인 등은 로컬 성공 응답 또는 안내 메시지로 남겨 두고, 필요한 추가 API는 [api-spec-addendum.md](../06-api/api-spec-addendum.md)에 정리했습니다.
+아직 명세가 없는 채팅, 문서 다운로드, username 중복 확인 등은 로컬 성공 응답 또는 안내 메시지로 처리합니다. 추가 API 제안은 [api-spec-addendum.md](../06-api/api-spec-addendum.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
 | 영역 | 기술 |
 |------|------|
 | UI | React 19, TypeScript, Ant Design 5 |
-| 빌드 | Vite 7 (`package.json` name: `humour-ui-mockup`) |
-| 차트 | ECharts 6 (`src/components/charts/`) |
-| 라우팅 | 해시 (`src/utils/routes.ts`, `src/data/mockData.tsx`) |
-| 스타일 | `src/styles.css` (CSS 변수·컴포넌트 클래스), Ant Design 토큰 (`App.tsx`) |
-| 폰트 | Noto Sans KR Clean, Noto Sans KR (테마 `fontFamily`) |
-| UI 검증 | Playwright Core (`scripts/verify-document-chat-widget.mjs`) |
+| 빌드 | Vite 7 |
+| HTTP client | Axios 1.17.0 |
+| 차트 | ECharts 6 |
+| 라우팅 | 해시 라우팅 |
+| 검증 | `npm run build`, `npm run lint`, Playwright 캡처 스크립트 |
 
 ## 정적 자산
 
-[`public/assets/`](../../public/assets/) — 브라우저 경로 `/assets/...`
+[`public/assets/`](../../public/assets/)는 Vite public 경로 `/assets/...`로 참조합니다.
 
-- `humour-app-icon.png` — 파비콘, 헤더 아이콘, 아바타, 채팅
-- `humour-logo-light.png` / `humour-logo-dark.png` — 인증·사이드바 로고
+- `humour-app-icon.png`
+- `humour-logo-light.png`
+- `humour-logo-dark.png`
 
 ## 관련 문서
 
